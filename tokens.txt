@@ -1,0 +1,6 @@
+(KEYWORD,void) (ID,main) (SYMBOL,() (KEYWORD,void) (SYMBOL,)) (SYMBOL,{)
+(KEYWORD,int) (ID,a) (SYMBOL,=) (NUM,0) (SYMBOL,;)
+(ID,a) (SYMBOL,=) (NUM,2) (SYMBOL,+) (NUM,2) (SYMBOL,;)
+(ID,a) (SYMBOL,=) (ID,a) (SYMBOL,-) (NUM,3) (SYMBOL,;)
+(ID,cde) (SYMBOL,=) (ID,a) (SYMBOL,;)
+(KEYWORD,if) (SYMBOL,() (ID,b) (SYMBOL,==) 

@@ -9,3 +9,7 @@
 9 case
 10 return
 11 endif
+12 main
+13 a
+14 cde
+15 b
