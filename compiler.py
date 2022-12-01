@@ -74,7 +74,7 @@ class DfaGraph:
             self.Nodes[nodeNum].final = name
 
 
-dfaGraph = DfaGraph(12, ["invalid number", "invalid input", "unmatched comment", "unclosed comment"])
+dfaGraph = DfaGraph(12, ["Invalid number", "Invalid input", "Unmatched comment", "Unclosed comment"])
 dfaGraph.setFinals([(1, "NUM"),
                     (2, "ID"),
                     (3, "SYMBOL"),
@@ -83,10 +83,10 @@ dfaGraph.setFinals([(1, "NUM"),
                     (6, "SYMBOL"),
                     (10, "comment"),
                     (11, "SYMBOL"),
-                    ("invalid number", "invalid number"),
-                    ("invalid input", "invalid input"),
-                    ("unclosed comment", "unclosed comment"),
-                    ("unmatched comment", "unmatched comment")
+                    ("Invalid number", "Invalid number"),
+                    ("Invalid input", "Invalid input"),
+                    ("Unclosed comment", "Unclosed comment"),
+                    ("Unmatched comment", "Unmatched comment")
                     ])
 dfaGraph.Nodes[0].addChildren([(1, "digit"),
                                (2, "letter"),
@@ -97,11 +97,11 @@ dfaGraph.Nodes[0].addChildren([(1, "digit"),
                                (11, "*"),
                                (0, 'EOF')])
 dfaGraph.Nodes[1].addChildren([(1, "digit"),
-                               ("invalid number", "letter"),
+                               ("Invalid number", "letter"),
                                (1, 'EOF')])
-dfaGraph.Nodes["invalid number"].addChildren([("invalid number", "letter"),
+dfaGraph.Nodes["Invalid number"].addChildren([("Invalid number", "letter"),
                                               (0, "sigma-letter"),
-                                              ("invalid number", 'EOF')])
+                                              ("Invalid number", 'EOF')])
 dfaGraph.Nodes[2].addChildren([(2, "digit"),
                                (2, "letter"),
                                (2, 'EOF')])
@@ -118,17 +118,17 @@ dfaGraph.Nodes[7].addChildren([(7, "ascii-\n-EOF"),
                                (10, 'EOF')])
 dfaGraph.Nodes[8].addChildren([(8, "ascii-*-EOF"),
                                (9, "*"),
-                               ("unclosed comment", "EOF")])
+                               ("Unclosed comment", "EOF")])
 dfaGraph.Nodes[9].addChildren([(8, "ascii-/-*-EOF"),
                                (9, "*"),
                                (10, "/"),
-                               ("unclosed comment", "EOF")])
+                               ("Unclosed comment", "EOF")])
 dfaGraph.Nodes[10].addChildren([(10, 'EOF')])
-dfaGraph.Nodes[11].addChildren([("unmatched comment", "/"),
+dfaGraph.Nodes[11].addChildren([("Unmatched comment", "/"),
                                 (11, 'EOF')])
-dfaGraph.Nodes["unmatched comment"].addChildren([(0, "sigma"),
-                                                 ("unmatched comment", 'EOF')])
-dfaGraph.Nodes["unclosed comment"].addChildren([(0, "ascii")])
+dfaGraph.Nodes["Unmatched comment"].addChildren([(0, "sigma"),
+                                                 ("Unmatched comment", 'EOF')])
+dfaGraph.Nodes["Unclosed comment"].addChildren([(0, "ascii")])
 #
 # for node in dfaGraph.Nodes.values():
 #     print("node name:" + str(node.name))
@@ -159,15 +159,16 @@ for symbol in symbol_dict:
 
 def get_next_token(dfaGraph: DfaGraph):
     token = ""
-    reachedNewLine = False
+
     while True:
+        reachedNewLine = False
         char = inputFile.read(1).decode("ascii")
         if char == '':
             char = "EOF"
             # dfaGraph.previousNode = dfaGraph.currentNode
             dfaGraph.currentNode = dfaGraph.currentNode.nextNode(char)
             return (dfaGraph.currentNode.final, token), True, reachedNewLine
-        if char == '\n':
+        if char == '\r':
             reachedNewLine = True
         dfaGraph.previousNode = dfaGraph.currentNode
         token += char
@@ -180,8 +181,12 @@ def get_next_token(dfaGraph: DfaGraph):
 
 
 tokenFile = open("tokens.txt", "w")
+lexicalErrorsFile = open("lexical_errors.txt", "w")
+linenumber = 1
 while True:
     nextToken, finished, lastInLine = get_next_token(dfaGraph)
+    if '\r' in nextToken[1]:
+        linenumber += 1
     nextToken = list(nextToken)
     if nextToken[0] == "ID":
         if nextToken[1] not in symbol_dict:
@@ -191,11 +196,15 @@ while True:
 
         nextToken[0] = symbol_dict[nextToken[1]]
 
-    if nextToken[0] == "unclosed comment":
-        nextToken[1] = nextToken[1][0:7] + "..."
-        tokenFile.write(str('(' + ','.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
+    if nextToken[0] == "Unclosed comment" or nextToken[0] == "Invalid number" or \
+            nextToken[0] == "Invalid input" or nextToken[0] == "Unmatched comment":
+        newLineNumber = linenumber
+        if nextToken[0] == "Unclosed comment":
+            newLineNumber -= nextToken[1].count('\r')
+            nextToken[1] = nextToken[1][0:7] + "..."
+        lexicalErrorsFile.write(str(newLineNumber) + ' (' + nextToken[1] + ', ' + nextToken[0] + ')\n')
     elif nextToken[0] != "ws" and nextToken[0] != "comment":
-        tokenFile.write(str('(' + ','.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
+        tokenFile.write(str('(' + ', '.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
 
     if finished:
         break
@@ -203,3 +212,4 @@ while True:
 
 inputFile.close()
 tokenFile.close()
+lexicalErrorsFile.close()
