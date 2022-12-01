@@ -182,11 +182,12 @@ def get_next_token(dfaGraph: DfaGraph):
 
 tokenFile = open("tokens.txt", "w")
 lexicalErrorsFile = open("lexical_errors.txt", "w")
-linenumber = 1
+lineNumber = 1
+hasLexicalError = False
 while True:
     nextToken, finished, lastInLine = get_next_token(dfaGraph)
     if '\r' in nextToken[1]:
-        linenumber += 1
+        lineNumber += 1
     nextToken = list(nextToken)
     if nextToken[0] == "ID":
         if nextToken[1] not in symbol_dict:
@@ -198,7 +199,8 @@ while True:
 
     if nextToken[0] == "Unclosed comment" or nextToken[0] == "Invalid number" or \
             nextToken[0] == "Invalid input" or nextToken[0] == "Unmatched comment":
-        newLineNumber = linenumber
+        hasLexicalError = True
+        newLineNumber = lineNumber
         if nextToken[0] == "Unclosed comment":
             newLineNumber -= nextToken[1].count('\r')
             nextToken[1] = nextToken[1][0:7] + "..."
@@ -207,6 +209,8 @@ while True:
         tokenFile.write(str('(' + ', '.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
 
     if finished:
+        if not hasLexicalError:
+            lexicalErrorsFile.write("There is no lexical error.")
         break
     # write function result to tokens.txt, each line has the line number and sequence of token pairs.
 
