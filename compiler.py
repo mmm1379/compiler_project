@@ -82,7 +82,11 @@ dfaGraph.setFinals([(1, "NUM"),
                     (5, "ws"),
                     (6, "SYMBOL"),
                     (10, "comment"),
-                    (11, "SYMBOL")
+                    (11, "SYMBOL"),
+                    ("invalid number", "invalid number"),
+                    ("invalid input", "invalid input"),
+                    ("unclosed comment", "unclosed comment"),
+                    ("unmatched comment", "unmatched comment")
                     ])
 dfaGraph.Nodes[0].addChildren([(1, "digit"),
                                (2, "letter"),
@@ -90,16 +94,25 @@ dfaGraph.Nodes[0].addChildren([(1, "digit"),
                                (4, "symbol-*"),
                                (5, "ws"),
                                (6, "/"),
-                               (11, "*")])
+                               (11, "*"),
+                               (0, 'EOF')])
 dfaGraph.Nodes[1].addChildren([(1, "digit"),
-                               ("invalid number", "letter")])
+                               ("invalid number", "letter"),
+                               (1, 'EOF')])
+dfaGraph.Nodes["invalid number"].addChildren([("invalid number", "letter"),
+                                              (0, "sigma-letter"),
+                                              ("invalid number", 'EOF')])
 dfaGraph.Nodes[2].addChildren([(2, "digit"),
-                               (2, "letter")])
-dfaGraph.Nodes[3].addChildren([(4, "=")])
-dfaGraph.Nodes[4].addChildren([])
-dfaGraph.Nodes[5].addChildren([(5, "ws")])
+                               (2, "letter"),
+                               (2, 'EOF')])
+dfaGraph.Nodes[3].addChildren([(4, "="),
+                               (3, 'EOF')])
+dfaGraph.Nodes[4].addChildren([(4, 'EOF')])
+dfaGraph.Nodes[5].addChildren([(5, "ws"),
+                               (5, 'EOF')])
 dfaGraph.Nodes[6].addChildren([(7, "/"),
-                               (8, "*")])
+                               (8, "*"),
+                               (6, 'EOF')])
 dfaGraph.Nodes[7].addChildren([(7, "ascii-\n-EOF"),
                                (10, '\n'),
                                (10, 'EOF')])
@@ -110,8 +123,12 @@ dfaGraph.Nodes[9].addChildren([(8, "ascii-/-*-EOF"),
                                (9, "*"),
                                (10, "/"),
                                ("unclosed comment", "EOF")])
-dfaGraph.Nodes[10].addChildren([])
-dfaGraph.Nodes[11].addChildren([("unmatched comment", "/")])
+dfaGraph.Nodes[10].addChildren([(10, 'EOF')])
+dfaGraph.Nodes[11].addChildren([("unmatched comment", "/"),
+                                (11, 'EOF')])
+dfaGraph.Nodes["unmatched comment"].addChildren([(0, "sigma"),
+                                                 ("unmatched comment", 'EOF')])
+dfaGraph.Nodes["unclosed comment"].addChildren([(0, "ascii")])
 #
 # for node in dfaGraph.Nodes.values():
 #     print("node name:" + str(node.name))
@@ -146,7 +163,10 @@ def get_next_token(dfaGraph: DfaGraph):
     while True:
         char = inputFile.read(1).decode("ascii")
         if char == '':
-            return (dfaGraph.previousNode.final, token), True, reachedNewLine
+            char = "EOF"
+            # dfaGraph.previousNode = dfaGraph.currentNode
+            dfaGraph.currentNode = dfaGraph.currentNode.nextNode(char)
+            return (dfaGraph.currentNode.final, token), True, reachedNewLine
         if char == '\n':
             reachedNewLine = True
         dfaGraph.previousNode = dfaGraph.currentNode
@@ -171,10 +191,14 @@ while True:
 
         nextToken[0] = symbol_dict[nextToken[1]]
 
+    if nextToken[0] == "unclosed comment":
+        nextToken[1] = nextToken[1][0:7] + "..."
+        tokenFile.write(str('(' + ','.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
+    elif nextToken[0] != "ws" and nextToken[0] != "comment":
+        tokenFile.write(str('(' + ','.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
+
     if finished:
         break
-    if nextToken[0] != "ws" and nextToken[0] != "comment":
-        tokenFile.write(str('(' + ','.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
     # write function result to tokens.txt, each line has the line number and sequence of token pairs.
 
 inputFile.close()
