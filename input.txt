@@ -1,16 +1,11 @@
-int main(){
-	while (arr[2milk]> 2){
-		x = 23apple;
-		mk3 = x + 1;
-		if mk3 == 52 :
-			b =# 32;
-			return 2;
+// Men of quality don't fear equality //#
+void main(int a, int b, Int c) {
+	while (arr[g] == 12){
+		killed = me; */
+		a;=;b-^&2d$a3#=3
 		break;
+		/* this is not wrong */
+		/*this is wrong *
+	return;
 	}
-	this = 2;
-	return;;!
 }
-# end of the code
-/* end of end of the code
-# hmmmmmm
-@#$#%%$*/

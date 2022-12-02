@@ -188,10 +188,11 @@ def get_next_token(dfaGraph: DfaGraph):
 
 
 tokenFile = open("tokens.txt", "w")
-tokenFile.write('1.\t')
 lexicalErrorsFile = open("lexical_errors.txt", "w")
 lineNumber = 1
 hasLexicalError = False
+lastLexicalLineNumber = None
+lastTokenLineNumber = None
 while True:
     nextToken, finished, lastInLine = get_next_token(dfaGraph)
     if '\n' in nextToken[1]:
@@ -208,16 +209,27 @@ while True:
     if nextToken[0] == "Unclosed comment" or nextToken[0] == "Invalid number" or \
             nextToken[0] == "Invalid input" or nextToken[0] == "Unmatched comment":
         hasLexicalError = True
+
         newLineNumber = lineNumber
         if nextToken[0] == "Unclosed comment":
             newLineNumber -= nextToken[1].count('\n')
-            nextToken[1] = nextToken[1][0:7] + "..."
-        lexicalErrorsFile.write(str(newLineNumber) + '.\t(' + nextToken[1].strip() + ', ' + nextToken[0] + ') \n')
+            nextToken[1] = nextToken[1][0:7] + "..." if len(nextToken[1]) > 7 else ""
+        if lastLexicalLineNumber == newLineNumber:
+            lexicalErrorsFile.write('('+(nextToken[1].strip() + ', ' + nextToken[0])+') ')
+        else:
+            if lastLexicalLineNumber is not None:
+                lexicalErrorsFile.write('\n')
+            lexicalErrorsFile.write(str(newLineNumber) + '.\t(' + nextToken[1].strip() + ', ' + nextToken[0] + ') ')
+            lastLexicalLineNumber = newLineNumber
     elif nextToken[0] != "ws" and nextToken[0] != "comment":
         # if
-        tokenFile.write(str('(' + ', '.join(nextToken) + ')')+' ')
-    if lastInLine and not finished:
-        tokenFile.write('\n'+str(lineNumber)+'.\t')
+        if lastTokenLineNumber == lineNumber:
+            tokenFile.write(str('(' + ', '.join(nextToken) + ')')+' ')
+        else:
+            if lastTokenLineNumber is not None:
+                tokenFile.write('\n')
+            tokenFile.write(str(lineNumber) + '.\t(' + ', '.join(nextToken) + ')'+' ')
+            lastTokenLineNumber = lineNumber
     if finished:
         tokenFile.write('\n')
 
