@@ -1,17 +1,21 @@
-vod min(voi){
-	switch (arr[2xefg]){
-		case 2abcd:
-			b = b + 1;
-		case 3:
-			b = b + 2;
-			return;
-		case 4:
-		{
-			#x = 5;
-			b = u * 123;
-			break;}
-		default:
-			b = b - 1;
-	}
-	return;
+int f(int a) {
+    void g(int b) {*/
+        output(b);
+        f(b - 1);
+    }
+    if (a == 1) {
+        output(a);
+        return 0;
+    } else {
+        g(a);
+    }
+    while (m==n) {
+    a = a +1 ;
+    }
+
+/
+}
+
+void main(void) {
+    f(10);
 }

@@ -105,9 +105,6 @@ dfaGraph.Nodes[0].setChildren([(1, "digit"),
 dfaGraph.Nodes[1].setChildren([(1, "digit"),
                                ("Invalid number", "letter"),
                                (1, 'EOF')])
-dfaGraph.Nodes["Invalid number"].setChildren([("Invalid number", "letter"),
-                                              (0, "sigma-letter"),
-                                              ("Invalid number", 'EOF')])
 dfaGraph.Nodes[2].setChildren([(2, "digit"),
                                (2, "letter"),
                                (2, 'EOF')])
@@ -132,6 +129,8 @@ dfaGraph.Nodes[9].setChildren([(8, "ascii-/-*-EOF"),
 dfaGraph.Nodes[10].setChildren([(10, 'EOF')])
 dfaGraph.Nodes[11].setChildren([("Unmatched comment", "/"),
                                 (11, 'EOF')])
+dfaGraph.Nodes["Invalid number"].setChildren([(0, "sigma-letter"),
+                                              ("Invalid number", 'EOF')])
 dfaGraph.Nodes["Unmatched comment"].setChildren([(0, "sigma"),
                                                  ("Unmatched comment", 'EOF')])
 dfaGraph.Nodes["Unclosed comment"].setChildren([(0, "ascii")])
@@ -213,13 +212,14 @@ while True:
         if nextToken[0] == "Unclosed comment":
             newLineNumber -= nextToken[1].count('\n')
             nextToken[1] = nextToken[1][0:7] + "..."
-        lexicalErrorsFile.write(str(newLineNumber) + '.\t(' + nextToken[1].strip() + ', ' + nextToken[0] + ')\n')
+        lexicalErrorsFile.write(str(newLineNumber) + '.\t(' + nextToken[1].strip() + ', ' + nextToken[0] + ') \n')
     elif nextToken[0] != "ws" and nextToken[0] != "comment":
         # if
         tokenFile.write(str('(' + ', '.join(nextToken) + ')')+' ')
     if lastInLine and not finished:
         tokenFile.write('\n'+str(lineNumber)+'.\t')
     if finished:
+        tokenFile.write('\n')
         if not hasLexicalError:
             lexicalErrorsFile.write("There is no lexical error.")
         break
