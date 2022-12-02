@@ -18,7 +18,9 @@ class Node:
         self.final = final
 
     def setChildren(self, children):
-        if self.name not in [7, 8, 9, "Invalid number", "Invalid input"]:
+        if self.name in [4, 5, 10, 11, "Unmatched comment"]:
+            children.append((0, "ascii-sigma-EOF"))
+        if self.name in [1, 2, 3, 6]:
             children.append(("Invalid input", "ascii-sigma-EOF"))
         for child in children:
 
@@ -103,7 +105,8 @@ dfaGraph.Nodes[0].setChildren([(1, "digit"),
                                (5, "ws"),
                                (6, "/"),
                                (11, "*"),
-                               (0, 'EOF')])
+                               (0, 'EOF'),
+                               ("Invalid input", "ascii-sigma-EOF")])
 dfaGraph.Nodes[1].setChildren([(1, "digit"),
                                ("Invalid number", "letter"),
                                (1, 'EOF')])
@@ -111,6 +114,7 @@ dfaGraph.Nodes[2].setChildren([(2, "digit"),
                                (2, "letter"),
                                (2, 'EOF')])
 dfaGraph.Nodes[3].setChildren([(4, "="),
+                               ("Invalid input", "ascii-sigma-EOF"),
                                (3, 'EOF')])
 dfaGraph.Nodes[4].setChildren([(4, 'EOF')])
 dfaGraph.Nodes[5].setChildren([(5, "ws"),
