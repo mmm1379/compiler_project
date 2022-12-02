@@ -161,7 +161,7 @@ symbolCount = 0
 symbolFile = open("symbol_table.txt", "w")
 for symbol in symbol_dict:
     symbolCount += 1
-    symbolFile.write(str(symbolCount) + " " + symbol + "\n")
+    symbolFile.write(str(symbolCount) + ".\t" + symbol + "\n")
 
 
 def get_next_token(dfaGraph: DfaGraph):
@@ -189,19 +189,20 @@ def get_next_token(dfaGraph: DfaGraph):
 
 
 tokenFile = open("tokens.txt", "w")
+tokenFile.write('1.\t')
 lexicalErrorsFile = open("lexical_errors.txt", "w")
 lineNumber = 1
 hasLexicalError = False
 while True:
     nextToken, finished, lastInLine = get_next_token(dfaGraph)
     if '\n' in nextToken[1]:
-        lineNumber += 1
+        lineNumber += nextToken[1].count('\n')
     nextToken = list(nextToken)
     if nextToken[0] == "ID":
         if nextToken[1] not in symbol_dict:
             symbol_dict[nextToken[1]] = "ID"
             symbolCount += 1
-            symbolFile.write(str(symbolCount) + ' ' + nextToken[1] + '\n')
+            symbolFile.write(str(symbolCount) + '.\t' + nextToken[1] + '\n')
 
         nextToken[0] = symbol_dict[nextToken[1]]
 
@@ -212,11 +213,12 @@ while True:
         if nextToken[0] == "Unclosed comment":
             newLineNumber -= nextToken[1].count('\n')
             nextToken[1] = nextToken[1][0:7] + "..."
-        lexicalErrorsFile.write(str(newLineNumber) + ' (' + nextToken[1].strip() + ', ' + nextToken[0] + ')\n')
+        lexicalErrorsFile.write(str(newLineNumber) + '.\t(' + nextToken[1].strip() + ', ' + nextToken[0] + ')\n')
     elif nextToken[0] != "ws" and nextToken[0] != "comment":
         # if
-        tokenFile.write(str('(' + ', '.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
-
+        tokenFile.write(str('(' + ', '.join(nextToken) + ')')+' ')
+    if lastInLine and not finished:
+        tokenFile.write('\n'+str(lineNumber)+'.\t')
     if finished:
         if not hasLexicalError:
             lexicalErrorsFile.write("There is no lexical error.")
