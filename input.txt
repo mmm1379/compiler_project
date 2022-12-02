@@ -1,21 +1,16 @@
-int f(int a) {
-    void g(int b) {*/
-        output(b);
-        f(b - 1);
-    }
-    if (a == 1) {
-        output(a);
-        return 0;
-    } else {
-        g(a);
-    }
-    while (m==n) {
-    a = a +1 ;
-    }
-
-/
+int main(){
+	while (arr[2milk]> 2){
+		x = 23apple;
+		mk3 = x + 1;
+		if mk3 == 52 :
+			b =# 32;
+			return 2;
+		break;
+	}
+	this = 2;
+	return;;!
 }
-
-void main(void) {
-    f(10);
-}
+# end of the code
+/* end of end of the code
+# hmmmmmm
+@#$#%%$*/

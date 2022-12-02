@@ -220,6 +220,7 @@ while True:
         tokenFile.write('\n'+str(lineNumber)+'.\t')
     if finished:
         tokenFile.write('\n')
+
         if not hasLexicalError:
             lexicalErrorsFile.write("There is no lexical error.")
         break
