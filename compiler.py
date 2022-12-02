@@ -17,8 +17,9 @@ class Node:
         self.dfaGraph = dfaGraph
         self.final = final
 
-    def addChildren(self, children):
-
+    def setChildren(self, children):
+        if self.name not in [7, 8, 9]:
+            children.append(("Invalid input", "ascii-sigma-EOF"))
         for child in children:
 
             edgeValue = child[1]
@@ -46,7 +47,12 @@ class Node:
                     allSet = sigma
                 else:
                     allSet = symbol
-                for char in allSet.difference(set(splitValue[1:])):
+                for char in splitValue[1:]:
+                    if char == "sigma":
+                        char = sigma
+                    allSet = allSet.difference(char)
+
+                for char in allSet:
                     self.edges[char] = self.dfaGraph.Nodes[childNum]
 
         if self.final is not None:
@@ -88,7 +94,7 @@ dfaGraph.setFinals([(1, "NUM"),
                     ("Unclosed comment", "Unclosed comment"),
                     ("Unmatched comment", "Unmatched comment")
                     ])
-dfaGraph.Nodes[0].addChildren([(1, "digit"),
+dfaGraph.Nodes[0].setChildren([(1, "digit"),
                                (2, "letter"),
                                (3, "="),
                                (4, "symbol-*"),
@@ -96,39 +102,40 @@ dfaGraph.Nodes[0].addChildren([(1, "digit"),
                                (6, "/"),
                                (11, "*"),
                                (0, 'EOF')])
-dfaGraph.Nodes[1].addChildren([(1, "digit"),
+dfaGraph.Nodes[1].setChildren([(1, "digit"),
                                ("Invalid number", "letter"),
                                (1, 'EOF')])
-dfaGraph.Nodes["Invalid number"].addChildren([("Invalid number", "letter"),
+dfaGraph.Nodes["Invalid number"].setChildren([("Invalid number", "letter"),
                                               (0, "sigma-letter"),
                                               ("Invalid number", 'EOF')])
-dfaGraph.Nodes[2].addChildren([(2, "digit"),
+dfaGraph.Nodes[2].setChildren([(2, "digit"),
                                (2, "letter"),
                                (2, 'EOF')])
-dfaGraph.Nodes[3].addChildren([(4, "="),
+dfaGraph.Nodes[3].setChildren([(4, "="),
                                (3, 'EOF')])
-dfaGraph.Nodes[4].addChildren([(4, 'EOF')])
-dfaGraph.Nodes[5].addChildren([(5, "ws"),
+dfaGraph.Nodes[4].setChildren([(4, 'EOF')])
+dfaGraph.Nodes[5].setChildren([(5, "ws"),
                                (5, 'EOF')])
-dfaGraph.Nodes[6].addChildren([(7, "/"),
+dfaGraph.Nodes[6].setChildren([(7, "/"),
                                (8, "*"),
                                (6, 'EOF')])
-dfaGraph.Nodes[7].addChildren([(7, "ascii-\n-EOF"),
+dfaGraph.Nodes[7].setChildren([(7, "ascii-\n-EOF"),
                                (10, '\n'),
                                (10, 'EOF')])
-dfaGraph.Nodes[8].addChildren([(8, "ascii-*-EOF"),
+dfaGraph.Nodes[8].setChildren([(8, "ascii-*-EOF"),
                                (9, "*"),
                                ("Unclosed comment", "EOF")])
-dfaGraph.Nodes[9].addChildren([(8, "ascii-/-*-EOF"),
+dfaGraph.Nodes[9].setChildren([(8, "ascii-/-*-EOF"),
                                (9, "*"),
                                (10, "/"),
                                ("Unclosed comment", "EOF")])
-dfaGraph.Nodes[10].addChildren([(10, 'EOF')])
-dfaGraph.Nodes[11].addChildren([("Unmatched comment", "/"),
+dfaGraph.Nodes[10].setChildren([(10, 'EOF')])
+dfaGraph.Nodes[11].setChildren([("Unmatched comment", "/"),
                                 (11, 'EOF')])
-dfaGraph.Nodes["Unmatched comment"].addChildren([(0, "sigma"),
+dfaGraph.Nodes["Unmatched comment"].setChildren([(0, "sigma"),
                                                  ("Unmatched comment", 'EOF')])
-dfaGraph.Nodes["Unclosed comment"].addChildren([(0, "ascii")])
+dfaGraph.Nodes["Unclosed comment"].setChildren([(0, "ascii")])
+dfaGraph.Nodes["Invalid input"].setChildren([])
 #
 # for node in dfaGraph.Nodes.values():
 #     print("node name:" + str(node.name))
@@ -160,15 +167,16 @@ for symbol in symbol_dict:
 def get_next_token(dfaGraph: DfaGraph):
     token = ""
 
+    reachedNewLine = False
     while True:
-        reachedNewLine = False
         char = inputFile.read(1).decode("ascii")
         if char == '':
             char = "EOF"
             # dfaGraph.previousNode = dfaGraph.currentNode
             dfaGraph.currentNode = dfaGraph.currentNode.nextNode(char)
             return (dfaGraph.currentNode.final, token), True, reachedNewLine
-        if char == '\r':
+        if char == '\n':
+            # fix for os
             reachedNewLine = True
         dfaGraph.previousNode = dfaGraph.currentNode
         token += char
@@ -186,7 +194,7 @@ lineNumber = 1
 hasLexicalError = False
 while True:
     nextToken, finished, lastInLine = get_next_token(dfaGraph)
-    if '\r' in nextToken[1]:
+    if '\n' in nextToken[1]:
         lineNumber += 1
     nextToken = list(nextToken)
     if nextToken[0] == "ID":
@@ -202,10 +210,11 @@ while True:
         hasLexicalError = True
         newLineNumber = lineNumber
         if nextToken[0] == "Unclosed comment":
-            newLineNumber -= nextToken[1].count('\r')
+            newLineNumber -= nextToken[1].count('\n')
             nextToken[1] = nextToken[1][0:7] + "..."
-        lexicalErrorsFile.write(str(newLineNumber) + ' (' + nextToken[1] + ', ' + nextToken[0] + ')\n')
+        lexicalErrorsFile.write(str(newLineNumber) + ' (' + nextToken[1].strip() + ', ' + nextToken[0] + ')\n')
     elif nextToken[0] != "ws" and nextToken[0] != "comment":
+        # if
         tokenFile.write(str('(' + ', '.join(nextToken) + ')') + ('\n' if lastInLine else ' '))
 
     if finished:

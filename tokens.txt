@@ -5,7 +5,7 @@
 (ID, cde) (SYMBOL, =) (ID, a) (SYMBOL, ;)
 (KEYWORD, if) (SYMBOL, () (ID, b) (SYMBOL, ==) (SYMBOL, )) (SYMBOL, {)
 (ID, a) (SYMBOL, =) (NUM, 3) (SYMBOL, ;)
-(ID, cde) (SYMBOL, =) (NUM, 7) (SYMBOL, ;)
+(ID, e) (SYMBOL, =) (NUM, 7) (SYMBOL, ;)
 (SYMBOL, })
 (KEYWORD, else) (SYMBOL, {)
 (ID, b) (SYMBOL, =) (ID, a) (SYMBOL, <) (ID, cde) (SYMBOL, ;)
