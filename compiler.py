@@ -18,7 +18,7 @@ class Node:
         self.final = final
 
     def setChildren(self, children):
-        if self.name not in [7, 8, 9, "Invalid number"]:
+        if self.name not in [7, 8, 9, "Invalid number", "Invalid input"]:
             children.append(("Invalid input", "ascii-sigma-EOF"))
         for child in children:
 
@@ -34,6 +34,8 @@ class Node:
                     toConvert = digit
                 elif splitValue[0] == "letter":
                     toConvert = letters
+                elif splitValue[0] == "ascii":
+                    toConvert = ascii
                 if toConvert is None:
                     self.edges[edgeValue] = self.dfaGraph.Nodes[childNum]
                 else:
@@ -134,7 +136,7 @@ dfaGraph.Nodes["Invalid number"].setChildren([(0, "ascii-letter"),
 dfaGraph.Nodes["Unmatched comment"].setChildren([(0, "sigma"),
                                                  ("Unmatched comment", 'EOF')])
 dfaGraph.Nodes["Unclosed comment"].setChildren([(0, "ascii")])
-dfaGraph.Nodes["Invalid input"].setChildren([])
+dfaGraph.Nodes["Invalid input"].setChildren([(0, "ascii")])
 #
 # for node in dfaGraph.Nodes.values():
 #     print("node name:" + str(node.name))
@@ -215,7 +217,7 @@ while True:
             newLineNumber -= nextToken[1].count('\n')
             nextToken[1] = nextToken[1][0:7] + "..." if len(nextToken[1]) > 7 else ""
         if lastLexicalLineNumber == newLineNumber:
-            lexicalErrorsFile.write('('+(nextToken[1].strip() + ', ' + nextToken[0])+') ')
+            lexicalErrorsFile.write('(' + (nextToken[1].strip() + ', ' + nextToken[0]) + ') ')
         else:
             if lastLexicalLineNumber is not None:
                 lexicalErrorsFile.write('\n')
@@ -224,11 +226,11 @@ while True:
     elif nextToken[0] != "ws" and nextToken[0] != "comment":
         # if
         if lastTokenLineNumber == lineNumber:
-            tokenFile.write(str('(' + ', '.join(nextToken) + ')')+' ')
+            tokenFile.write(str('(' + ', '.join(nextToken) + ')') + ' ')
         else:
             if lastTokenLineNumber is not None:
                 tokenFile.write('\n')
-            tokenFile.write(str(lineNumber) + '.\t(' + ', '.join(nextToken) + ')'+' ')
+            tokenFile.write(str(lineNumber) + '.\t(' + ', '.join(nextToken) + ')' + ' ')
             lastTokenLineNumber = lineNumber
     if finished:
         tokenFile.write('\n')

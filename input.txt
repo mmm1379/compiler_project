@@ -1,23 +1,23 @@
+int func (int a, int b){
+	int a = 10;
+int b = 100;
+
+outpt(1000);
+
+if(a > 1000){
+return a;
+}
+
+while (b < 10000){
+b = b * a;
+}
+
+return b;
+
+}
+
 void main (void){
-int $$$$;
-int &&&&;
-int ****;
-int while;
-
-int /*test*/;
-
-
-//comment
-/bad comment
-
-void g (int a){
-void f (int b){
-return 10;
-}
-return f(10);
-}
-
-return -1;
-
+int var = f(10, 5);
+return 0;
 
 }
