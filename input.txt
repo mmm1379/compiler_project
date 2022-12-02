@@ -1,17 +1,12 @@
-/* bad comment
+/* text */
 
 void main (void){
-	int 0101;
-	int b;
-	int a = b;
-	break;
-	int f = a < b + b * a;
-	int 10g;
-	/ comment;
-	if (f){
-	int my_int = 10
+	int i = 0;
+	while (i < 10){
+		i = i + 1;
 	}
-	return 100;
-	
+	int j  = i + 100; // comment
+	int out = i + j;
+	output(out);
 
 }

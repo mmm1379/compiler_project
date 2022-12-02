@@ -1,1 +1,1 @@
-1.	(/* bad ..., Unclosed comment) 
+There is no lexical error.
