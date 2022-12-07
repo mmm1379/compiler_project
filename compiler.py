@@ -26,6 +26,7 @@ class Node:
             children.append(("Invalid input", "ascii-sigma-EOF"))
         for child in children:
 
+
             edgeValue = child[1]
             childNum = child[0]
             splitValue = edgeValue.split("-")
