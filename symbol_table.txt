@@ -10,11 +10,3 @@
 10.	return
 11.	endif
 12.	main
-13.	a
-14.	b
-15.	Int
-16.	c
-17.	arr
-18.	g
-19.	killed
-20.	me
