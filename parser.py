@@ -10,7 +10,7 @@ class Node:
             if self.printName[0] == "$":
                 self.printName = "$"
             else:
-                self.printName = tuple(self.printName[:-1])
+                self.printName = "(" + self.printName[0] + "," + self.printName[1] + ")"
         else:
             self.name = name
         self.children = []
@@ -97,7 +97,8 @@ while True:
 
 def writeToParseTreeFile():
     text_file = open("parse_tree.txt", "w")
-    n = text_file.write(newParent.getPrintString())
+    n = text_file.write(newParent.getPrintString().strip())
     text_file.close()
+
 
 writeToParseTreeFile()
