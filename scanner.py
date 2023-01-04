@@ -250,7 +250,7 @@ def get_next_token():
         inputFile.close()
         tokenFile.close()
         lexicalErrorsFile.close()
-        return "EOF"
+        return ("$", "EOF")
     return get_next_token()
     # write function result to tokens.txt, each line has the line number and sequence of token pairs.
 
