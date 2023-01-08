@@ -107,7 +107,7 @@ def parseNextToken():
                     non_state, state = stack[-2], stack[-1][0]
                     if op.startswith("goto"):
 
-                        while nextToken[0] not in follows[non_terminal]:
+                        while nextToken[2] not in follows[non_terminal]:
                             if nextToken[0] == "$":
                                 writeSyntaxError("syntax error , Unexpected EOF", lineNumber)
                                 return True
