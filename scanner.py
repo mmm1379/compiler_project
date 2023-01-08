@@ -201,10 +201,24 @@ lineNumber = 1
 hasLexicalError = False
 lastLexicalLineNumber = None
 lastTokenLineNumber = None
+finished = False
+
+
+def scannerFinished():
+    tokenFile.write('\n')
+
+    if not hasLexicalError:
+        lexicalErrorsFile.write("There is no lexical error.")
+    inputFile.close()
+    tokenFile.close()
+    lexicalErrorsFile.close()
+    return {"nextToken": ("$", "EOF"), "lineNumber": lineNumber}
 
 
 def get_next_token():
-    global lineNumber, symbolCount, lastTokenLineNumber, lastLexicalLineNumber, hasLexicalError
+    global lineNumber, symbolCount, lastTokenLineNumber, lastLexicalLineNumber, hasLexicalError, finished
+    if finished:
+        return scannerFinished()
     nextToken, finished, lastInLine = get_next_token_old(dfaGraph)
     if '\n' in nextToken[1]:
         lineNumber += nextToken[1].count('\n')
@@ -243,13 +257,6 @@ def get_next_token():
             lastTokenLineNumber = lineNumber
         return {"nextToken": nextToken, "lineNumber": lineNumber}
     if finished:
-        tokenFile.write('\n')
-
-        if not hasLexicalError:
-            lexicalErrorsFile.write("There is no lexical error.")
-        inputFile.close()
-        tokenFile.close()
-        lexicalErrorsFile.close()
-        return {"nextToken": ("$", "EOF"), "lineNumber": lineNumber}
+        return scannerFinished()
     return get_next_token()
     # write function result to tokens.txt, each line has the line number and sequence of token pairs.

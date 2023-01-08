@@ -76,12 +76,6 @@ while True:
     nextTokenDict = get_next_token()
     lineNumber = nextTokenDict["lineNumber"]
     nextToken = list(nextTokenDict["nextToken"])
-    # if not reachedEnd:
-    # if nextToken[0] == '$':
-    #     reachedEnd = True
-    # print(nextToken)
-    # if nextToken == "EOF":
-    #     break
     if nextToken[0] in ["KEYWORD", "SYMBOL"]:
         nextToken.append(nextToken[1])
     else:

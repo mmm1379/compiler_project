@@ -9,6 +9,10 @@
 9.	case
 10.	return
 11.	endif
-12.	main
-13.	a
-14.	b
+12.	global1
+13.	global2
+14.	a
+15.	b
+16.	c
+17.	main
+18.	array
