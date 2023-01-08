@@ -196,7 +196,7 @@ def get_next_token_old(dfaGraph: DfaGraph):
 
 
 tokenFile = open("tokens.txt", "w")
-lexicalErrorsFile = open("p2_testcases/T07/lexical_errors.txt", "w")
+lexicalErrorsFile = open("lexical_errors.txt", "w")
 lineNumber = 1
 hasLexicalError = False
 lastLexicalLineNumber = None

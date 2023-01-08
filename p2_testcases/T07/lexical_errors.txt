@@ -1,2 +1,0 @@
-3.	(len_, Invalid input) 
-7.	(len_, Invalid input) 
