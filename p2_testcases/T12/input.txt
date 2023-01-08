@@ -5,13 +5,13 @@ void main(void){
 	a = 5;
     switch (fibonachi(a)) {
        case 1 : {
-                 while(x>2){
+                 while(x<2){
                  printf(x);
                  x = x - 1;
                  }
               }
        case 2 : {
-                if(x>y){
+                if(x<y){
                     printf(x);
                } endif;
               }

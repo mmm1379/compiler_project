@@ -160,6 +160,7 @@ def writeToParseTreeFile():
     n = text_file.write(newParent.getPrintString().strip())
     text_file.close()
 
+
 if not hasSyntaxError:
     syntaxErrorFile.write("There is no syntax error.")
 writeToParseTreeFile()
