@@ -9,9 +9,8 @@
 9.	case
 10.	return
 11.	endif
-12.	fibonachi
-13.	n
-14.	main
-15.	a
-16.	output
-17.	exit
+12.	s
+13.	array
+14.	index
+15.	tmp
+16.	main
