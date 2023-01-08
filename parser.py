@@ -22,7 +22,6 @@ class Node:
     def addChild(self, child):
         self.children.append(child)
 
-
     def getPrintString(self, depth=0, terminateList=None, stringBuilder=[]):
         if terminateList is None:
             terminateList = []
@@ -57,12 +56,16 @@ nextToken = (None, None)
 
 syntaxErrorFile = open("syntax_errors.txt", "w")
 
+hasSyntaxError = False
+
 
 def writeSyntaxError(error, lineNo=None):
+    global hasSyntaxError
+    hasSyntaxError = True
     printable_line_number = ""
     if lineNo is not None:
         printable_line_number = f"#{lineNo} : "
-    syntaxErrorFile.write(printable_line_number + error+"\n")
+    syntaxErrorFile.write(printable_line_number + error + "\n")
 
 
 while True:
@@ -157,5 +160,6 @@ def writeToParseTreeFile():
     n = text_file.write(newParent.getPrintString().strip())
     text_file.close()
 
-
+if not hasSyntaxError:
+    syntaxErrorFile.write("There is no syntax error.")
 writeToParseTreeFile()
