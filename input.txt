@@ -1,29 +1,27 @@
-/* sample 4 */
+/* sample 5 */
 
-int fibonachi(int n){
-  if(n==1)
-     return 1;
-  endif
-  if(n==2)
-     return 2;
-  endif
-  return fibonachi(n) + fibonachi(n-1);
+int s(int array[], int len_array){
+  int index;
+  int tmp;
+  index = 0;
+  while(index < len_array - 1){
+      switch(array[index+1] < array[index]) {
+            case 1 : {
+                  tmp = array[index];
+                  array[index] = array[index+1];
+                  array[index+1] = tmp;
+                  index = index - 1;
+            }
+            case 2 : index = index + 1;
+      }
+  }
 }
 
 void main(void){
-	a = 5;
-    switch (fibonachi(a)) {
-       case 1 : 1;
-       case 2 : {
-                output(2);
-               }
-       case 3 :  3;
-       case 5 :  4;
-       default : exit();
-    }
-
-    switch (fibonachi(a)) {
-       case 1 : 1;
-       case 2:   ;
-    }
+	int array[5];
+	array[0] = 23*12;
+	array[1] = (23-12)*2/3;
+	array[2] = 1 + 1 - 2 * 3 / (4+112);
+    array[3] = 912;
+    s(array, 4);
 }
