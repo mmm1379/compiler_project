@@ -33,7 +33,9 @@ class Node:
             for i in terminateList:
                 if i:
                     stringBuilder.append("│")
-                stringBuilder.append("    ")
+                else:
+                    stringBuilder.append(" ")
+                stringBuilder.append("   ")
             if child == self.children[0]:
                 stringBuilder.append("└── ")
                 childTerminateList.append(0)
