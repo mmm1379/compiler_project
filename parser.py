@@ -22,7 +22,9 @@ class Node:
     def addChild(self, child):
         self.children.append(child)
 
-    def getPrintString(self, depth=0, terminateList=None, stringBuilder=[]):
+    def getPrintString(self, depth=0, terminateList=None, stringBuilder=None):
+        if stringBuilder is None:
+            stringBuilder = []
         if terminateList is None:
             terminateList = []
         stringBuilder.append(str(self.printName) + "\n")
@@ -31,7 +33,7 @@ class Node:
             for i in terminateList:
                 if i:
                     stringBuilder.append("│")
-                stringBuilder.append("\t")
+                stringBuilder.append("    ")
             if child == self.children[0]:
                 stringBuilder.append("└── ")
                 childTerminateList.append(0)
@@ -57,7 +59,7 @@ nextToken = (None, None)
 syntaxErrorFile = open("syntax_errors.txt", "w")
 
 hasSyntaxError = False
-
+newParent = None
 
 def writeSyntaxError(error, lineNo=None):
     global hasSyntaxError
@@ -68,11 +70,16 @@ def writeSyntaxError(error, lineNo=None):
     syntaxErrorFile.write(printable_line_number + error + "\n")
 
 
-while True:
+def parseNextToken():
+    global  nextToken, newParent
     flag = False
     if nextToken[0] == "$":
         newParent.children = [stack[-2][1]] + newParent.children
-        break
+        if not hasSyntaxError:
+            syntaxErrorFile.write("There is no syntax error.")
+        writeToParseTreeFile()
+
+        return True
     nextTokenDict = get_next_token()
     lineNumber = nextTokenDict["lineNumber"]
     nextToken = list(nextTokenDict["nextToken"])
@@ -101,7 +108,7 @@ while True:
                         while nextToken[0] not in follows[non_terminal]:
                             if nextToken[0] == "$":
                                 writeSyntaxError("syntax error , Unexpected EOF", lineNumber)
-                                exit(0)
+                                return True
                             else:
                                 writeSyntaxError(f"syntax error , discarded {nextToken[1]} from input", lineNumber)
                             nextTokenDict = get_next_token()
@@ -147,14 +154,10 @@ while True:
         if ptResult[0] == "goto":
             stack.append(Node(ptResult[1]).getTuple())
             flag = False
+    return False
 
 
 def writeToParseTreeFile():
     text_file = open("parse_tree.txt", "w")
     n = text_file.write(newParent.getPrintString().strip())
     text_file.close()
-
-
-if not hasSyntaxError:
-    syntaxErrorFile.write("There is no syntax error.")
-writeToParseTreeFile()
