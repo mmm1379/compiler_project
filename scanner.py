@@ -241,7 +241,7 @@ def get_next_token():
                 tokenFile.write('\n')
             tokenFile.write(str(lineNumber) + '.\t(' + ', '.join(nextToken) + ')' + ' ')
             lastTokenLineNumber = lineNumber
-        return nextToken
+        return {"nextToken": nextToken, "lineNumber": lineNumber}
     if finished:
         tokenFile.write('\n')
 
@@ -250,8 +250,6 @@ def get_next_token():
         inputFile.close()
         tokenFile.close()
         lexicalErrorsFile.close()
-        return ("$", "EOF")
+        return {"nextToken": ("$", "EOF"), "lineNumber": lineNumber}
     return get_next_token()
     # write function result to tokens.txt, each line has the line number and sequence of token pairs.
-
-
