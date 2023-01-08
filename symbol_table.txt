@@ -9,9 +9,6 @@
 9.	case
 10.	return
 11.	endif
-12.	fibonachi
-13.	n
-14.	main
-15.	a
-16.	output
-17.	exit
+12.	main
+13.	prod
+14.	i
