@@ -5,7 +5,7 @@ int global2;
 
 int a(int a, int b, int c[]){
    global1 = 0;
-   while(a>b){
+   while(a<b){
      global2 = global1 + c[a+b-1];
      a = a - b;
    }

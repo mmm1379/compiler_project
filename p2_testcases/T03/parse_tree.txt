@@ -71,6 +71,13 @@ program
 │   │               │   │   │           ├── (SYMBOL, ()
 │   │               │   │   │           ├── expression
 │   │               │   │   │           │   └── simple_expression
+│   │               │   │   │           │       ├── additive_expression
+│   │               │   │   │           │       │   └── term
+│   │               │   │   │           │       │       └── factor
+│   │               │   │   │           │       │           └── var
+│   │               │   │   │           │       │               └── (ID, a)
+│   │               │   │   │           │       ├── relop
+│   │               │   │   │           │       │   └── (SYMBOL, <)
 │   │               │   │   │           │       └── additive_expression
 │   │               │   │   │           │           └── term
 │   │               │   │   │           │               └── factor
@@ -221,6 +228,13 @@ program
 │   │               │   │   │                   │           ├── (SYMBOL, ()
 │   │               │   │   │                   │           ├── expression
 │   │               │   │   │                   │           │   └── simple_expression
+│   │               │   │   │                   │           │       ├── additive_expression
+│   │               │   │   │                   │           │       │   └── term
+│   │               │   │   │                   │           │       │       └── factor
+│   │               │   │   │                   │           │       │           └── var
+│   │               │   │   │                   │           │       │               └── (ID, b)
+│   │               │   │   │                   │           │       ├── relop
+│   │               │   │   │                   │           │       │   └── (SYMBOL, <)
 │   │               │   │   │                   │           │       └── additive_expression
 │   │               │   │   │                   │           │           └── term
 │   │               │   │   │                   │           │               └── factor
