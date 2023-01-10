@@ -104,6 +104,7 @@ def parseNextToken():
             while True:
                 non_state, state = stack[-2], stack[-1][0]
                 for non_terminal, op in parse_table[state].items():
+
                     non_state, state = stack[-2], stack[-1][0]
                     if op.startswith("goto"):
 

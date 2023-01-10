@@ -1,18 +1,15 @@
-/* sample 9 */
+/* sample 10 */
 
 int f(int a) {
-    void g(int b) {
+     void g(int b) {
         output(b);
-        f(b-b);
-    }
-    if (a == ) {
-        output(a);
-        return 0-0;
-    } else {
-        g(a-a);
-	t = 0;
+        return f(b-1)+f(b-2);
     }
 
+    if (a==0)
+        return 0;
+    else
+        return g(a);
     endif
 }
 

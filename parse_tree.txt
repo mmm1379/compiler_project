@@ -54,10 +54,35 @@ program
 │   │               │   │           │   │           │                       └── (SYMBOL, ))
 │   │               │   │           │   │           └── (SYMBOL, ;)
 │   │               │   │           │   └── statement
-│   │               │   │           │       └── expression_stmt
+│   │               │   │           │       └── return_stmt
+│   │               │   │           │           ├── (KEYWORD, return)
 │   │               │   │           │           ├── expression
 │   │               │   │           │           │   └── simple_expression
 │   │               │   │           │           │       └── additive_expression
+│   │               │   │           │           │           ├── additive_expression
+│   │               │   │           │           │           │   └── term
+│   │               │   │           │           │           │       └── factor
+│   │               │   │           │           │           │           └── call
+│   │               │   │           │           │           │               ├── (ID, f)
+│   │               │   │           │           │           │               ├── (SYMBOL, ()
+│   │               │   │           │           │           │               ├── args
+│   │               │   │           │           │           │               │   └── arg_list
+│   │               │   │           │           │           │               │       └── expression
+│   │               │   │           │           │           │               │           └── simple_expression
+│   │               │   │           │           │           │               │               └── additive_expression
+│   │               │   │           │           │           │               │                   ├── additive_expression
+│   │               │   │           │           │           │               │                   │   └── term
+│   │               │   │           │           │           │               │                   │       └── factor
+│   │               │   │           │           │           │               │                   │           └── var
+│   │               │   │           │           │           │               │                   │               └── (ID, b)
+│   │               │   │           │           │           │               │                   ├── addop
+│   │               │   │           │           │           │               │                   │   └── (SYMBOL, -)
+│   │               │   │           │           │           │               │                   └── term
+│   │               │   │           │           │           │               │                       └── factor
+│   │               │   │           │           │           │               │                           └── (NUM, 1)
+│   │               │   │           │           │           │               └── (SYMBOL, ))
+│   │               │   │           │           │           ├── addop
+│   │               │   │           │           │           │   └── (SYMBOL, +)
 │   │               │   │           │           │           └── term
 │   │               │   │           │           │               └── factor
 │   │               │   │           │           │                   └── call
@@ -77,8 +102,7 @@ program
 │   │               │   │           │           │                       │                   │   └── (SYMBOL, -)
 │   │               │   │           │           │                       │                   └── term
 │   │               │   │           │           │                       │                       └── factor
-│   │               │   │           │           │                       │                           └── var
-│   │               │   │           │           │                       │                               └── (ID, b)
+│   │               │   │           │           │                       │                           └── (NUM, 2)
 │   │               │   │           │           │                       └── (SYMBOL, ))
 │   │               │   │           │           └── (SYMBOL, ;)
 │   │               │   │           └── (SYMBOL, })
@@ -88,17 +112,51 @@ program
 │   │               │           ├── (SYMBOL, ()
 │   │               │           ├── expression
 │   │               │           │   └── simple_expression
+│   │               │           │       ├── additive_expression
+│   │               │           │       │   └── term
+│   │               │           │       │       └── factor
+│   │               │           │       │           └── var
+│   │               │           │       │               └── (ID, a)
+│   │               │           │       ├── relop
+│   │               │           │       │   └── (SYMBOL, ==)
 │   │               │           │       └── additive_expression
-│   │               │           │           ├── additive_expression
-│   │               │           │           ├── addop
-│   │               │           │           │   └── (SYMBOL, -)
 │   │               │           │           └── term
 │   │               │           │               └── factor
-│   │               │           │                   └── var
-│   │               │           │                       └── (ID, a)
+│   │               │           │                   └── (NUM, 0)
 │   │               │           ├── (SYMBOL, ))
 │   │               │           ├── statement
-│   │               │           │   └── compound_stmt
+│   │               │           │   └── return_stmt
+│   │               │           │       ├── (KEYWORD, return)
+│   │               │           │       ├── expression
+│   │               │           │       │   └── simple_expression
+│   │               │           │       │       └── additive_expression
+│   │               │           │       │           └── term
+│   │               │           │       │               └── factor
+│   │               │           │       │                   └── (NUM, 0)
+│   │               │           │       └── (SYMBOL, ;)
+│   │               │           ├── (KEYWORD, else)
+│   │               │           ├── statement
+│   │               │           │   └── return_stmt
+│   │               │           │       ├── (KEYWORD, return)
+│   │               │           │       ├── expression
+│   │               │           │       │   └── simple_expression
+│   │               │           │       │       └── additive_expression
+│   │               │           │       │           └── term
+│   │               │           │       │               └── factor
+│   │               │           │       │                   └── call
+│   │               │           │       │                       ├── (ID, g)
+│   │               │           │       │                       ├── (SYMBOL, ()
+│   │               │           │       │                       ├── args
+│   │               │           │       │                       │   └── arg_list
+│   │               │           │       │                       │       └── expression
+│   │               │           │       │                       │           └── simple_expression
+│   │               │           │       │                       │               └── additive_expression
+│   │               │           │       │                       │                   └── term
+│   │               │           │       │                       │                       └── factor
+│   │               │           │       │                       │                           └── var
+│   │               │           │       │                       │                               └── (ID, a)
+│   │               │           │       │                       └── (SYMBOL, ))
+│   │               │           │       └── (SYMBOL, ;)
 │   │               │           └── (KEYWORD, endif)
 │   │               └── (SYMBOL, })
 │   └── declaration
