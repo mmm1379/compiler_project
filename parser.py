@@ -92,7 +92,10 @@ def parseNextToken():
 
     while not flag:
         if nextToken[2] not in parse_table[stack[-1][0]]:
-            writeSyntaxError(f"syntax error , illegal {nextToken[2]}", lineNumber)
+            if nextToken[0] == "ID":
+                writeSyntaxError(f"syntax error , illegal {nextToken[1]}", lineNumber)
+            else:
+                writeSyntaxError(f"syntax error , illegal {nextToken[2]}", lineNumber)
             nextTokenDict = get_next_token()
             lineNumber = nextTokenDict["lineNumber"]
             nextToken = list(nextTokenDict["nextToken"])
@@ -105,15 +108,23 @@ def parseNextToken():
                 non_terminals = []
                 for non_terminal, op in parse_table[stack[-1][0]].items():
                     if op.startswith("goto"):
-                        non_terminals.append(non_terminal)
+                        non_terminals.append((non_terminal,op.split('_')[1]))
 
-                non_terminal_with_follow = None
+                non_terminal_in_follow = None
                 if len(non_terminals):
-                    for nt in sorted(non_terminals):
+                    non_terminals.sort()
+                    for nt, state in non_terminals:
                         if nextToken[2] in follows[nt]:
-                            non_terminal_with_follow = nt
+                            non_terminal_in_follow = nt
                             break
-                if non_terminal_with_follow is None:
+                else:
+                    non_state = stack[-2]
+                    stack.pop()
+                    stack.pop()
+                    writeSyntaxError(f"syntax error , discarded {non_state[1].printName} from stack")
+                    continue
+
+                if non_terminal_in_follow is None:
                     if nextToken[0] == "$":
                         writeSyntaxError("syntax error , Unexpected EOF", lineNumber)
                         return True
@@ -130,15 +141,11 @@ def parseNextToken():
                     flag2 = True
 
                 if flag2:
-                    non_terminal = non_terminal_with_follow
+                    non_terminal = non_terminal_in_follow
                     stack.append((non_terminal, Node(non_terminal)))
-                    stack.append((op.split('_')[1], Node(op.split('_')[1])))
+                    stack.append((state, Node(state)))
                     break
-                else:
-                    non_state = stack[-2]
-                    stack.pop()
-                    stack.pop()
-                    writeSyntaxError(f"syntax error , discarded {non_state[1].printName} from stack")
+
             writeSyntaxError(f"syntax error , missing {non_terminal}", lineNumber)
 
         ptResult = parse_table[stack[-1][0]][nextToken[2]].split('_')

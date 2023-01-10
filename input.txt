@@ -1,22 +1,8 @@
-/* sample 9 */
+/* sample 7 */
 
-int f(int a) {
-    void g(int b) {
-        output(b);
-        f(b-b);
-    }
-    if (a == ) {
-        output(a);
-        return 0-0;
-    } else {
-        g(a-a);
-	t = 0;
-    }
-
-    endif
-}
-
-
-void main(void) {
-    f(10);
+void main(int{
+	int prod;
+	int i;
+	prod = 1;
+	i = 1;
 }
