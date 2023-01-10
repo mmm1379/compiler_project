@@ -92,10 +92,7 @@ def parseNextToken():
 
     while not flag:
         if nextToken[2] not in parse_table[stack[-1][0]]:
-            if nextToken[0] == "ID":
-                writeSyntaxError(f"syntax error , illegal {nextToken[1]}", lineNumber)
-            else:
-                writeSyntaxError(f"syntax error , illegal {nextToken[2]}", lineNumber)
+            writeSyntaxError(f"syntax error , illegal {nextToken[1]}", lineNumber)
             nextTokenDict = get_next_token()
             lineNumber = nextTokenDict["lineNumber"]
             nextToken = list(nextTokenDict["nextToken"])
@@ -147,6 +144,8 @@ def parseNextToken():
                     break
 
             writeSyntaxError(f"syntax error , missing {non_terminal}", lineNumber)
+            if flag2:
+                continue
 
         ptResult = parse_table[stack[-1][0]][nextToken[2]].split('_')
         if ptResult[0] == "shift":
