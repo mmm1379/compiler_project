@@ -1,6 +1,0 @@
-3.	(KEYWORD, int) (ID, f) (SYMBOL, () (KEYWORD, int) (ID, a) (SYMBOL, )) (SYMBOL, {) 
-4.	(KEYWORD, void) (ID, g) (SYMBOL, () (KEYWORD, int) (ID, b) (SYMBOL, )) (SYMBOL, {) 
-5.	(ID, output) (SYMBOL, () (ID, b) (SYMBOL, )) (SYMBOL, ;) 
-6.	(ID, f) (SYMBOL, () (ID, b) (SYMBOL, -) (ID, b) (SYMBOL, )) (SYMBOL, ;) 
-7.	(SYMBOL, }) 
-8.	(KEYWORD, if) (SYMBOL, () (ID, a) (SYMBOL, ==) (SYMBOL, )) (SYMBOL, {) 

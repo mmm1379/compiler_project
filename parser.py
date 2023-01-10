@@ -102,33 +102,40 @@ def parseNextToken():
                 nextToken.append(nextToken[0])
             flag2 = False
             while True:
-                non_state, state = stack[-2], stack[-1][0]
-                for non_terminal, op in parse_table[state].items():
-
-                    non_state, state = stack[-2], stack[-1][0]
+                non_terminals = []
+                for non_terminal, op in parse_table[stack[-1][0]].items():
                     if op.startswith("goto"):
+                        non_terminals.append(non_terminal)
 
-                        while nextToken[2] not in follows[non_terminal]:
-                            if nextToken[0] == "$":
-                                writeSyntaxError("syntax error , Unexpected EOF", lineNumber)
-                                return True
-                            else:
-                                writeSyntaxError(f"syntax error , discarded {nextToken[1]} from input", lineNumber)
-                            nextTokenDict = get_next_token()
-                            lineNumber = nextTokenDict["lineNumber"]
-                            nextToken = list(nextTokenDict["nextToken"])
-                            if nextToken[0] in ["KEYWORD", "SYMBOL"]:
-                                nextToken.append(nextToken[1])
-                            else:
-                                nextToken.append(nextToken[0])
-                        flag2 = True
-                        break
+                non_terminal_with_follow = None
+                if len(non_terminals):
+                    for nt in sorted(non_terminals):
+                        if nextToken[2] in follows[nt]:
+                            non_terminal_with_follow = nt
+                            break
+                if non_terminal_with_follow is None:
+                    if nextToken[0] == "$":
+                        writeSyntaxError("syntax error , Unexpected EOF", lineNumber)
+                        return True
+                    else:
+                        writeSyntaxError(f"syntax error , discarded {nextToken[1]} from input", lineNumber)
+                    nextTokenDict = get_next_token()
+                    lineNumber = nextTokenDict["lineNumber"]
+                    nextToken = list(nextTokenDict["nextToken"])
+                    if nextToken[0] in ["KEYWORD", "SYMBOL"]:
+                        nextToken.append(nextToken[1])
+                    else:
+                        nextToken.append(nextToken[0])
+                else:
+                    flag2 = True
 
                 if flag2:
+                    non_terminal = non_terminal_with_follow
                     stack.append((non_terminal, Node(non_terminal)))
                     stack.append((op.split('_')[1], Node(op.split('_')[1])))
                     break
                 else:
+                    non_state = stack[-2]
                     stack.pop()
                     stack.pop()
                     writeSyntaxError(f"syntax error , discarded {non_state[1].printName} from stack")
