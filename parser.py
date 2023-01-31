@@ -1,10 +1,12 @@
 import json
 from scanner import get_next_token
+from code_gen import cod_gen, scopeIntro, scopeOutro
 
 
 class Node:
     def __init__(self, name, isLeaf=False):
         self.printName = name
+        self.actualName = name
         if isLeaf:
             self.name = name[2]
             if self.printName[0] == "$":
@@ -63,6 +65,7 @@ syntaxErrorFile = open("syntax_errors.txt", "w")
 hasSyntaxError = False
 newParent = None
 
+
 def writeSyntaxError(error, lineNo=None):
     global hasSyntaxError
     hasSyntaxError = True
@@ -73,8 +76,13 @@ def writeSyntaxError(error, lineNo=None):
 
 
 def parseNextToken():
-    global  nextToken, newParent
+    global nextToken, newParent
     flag = False
+    if nextToken[0] == "{":
+        scopeIntro()
+    if nextToken[0] == "}":
+        scopeOutro()
+
     if nextToken[0] == "$":
         newParent.children = [stack[-2][1]] + newParent.children
         if not hasSyntaxError:
@@ -105,7 +113,7 @@ def parseNextToken():
                 non_terminals = []
                 for non_terminal, op in parse_table[stack[-1][0]].items():
                     if op.startswith("goto"):
-                        non_terminals.append((non_terminal,op.split('_')[1]))
+                        non_terminals.append((non_terminal, op.split('_')[1]))
 
                 non_terminal_in_follow = None
                 if len(non_terminals):
@@ -164,6 +172,7 @@ def parseNextToken():
                 for i in range(len(popList) - 2, -1, -2):
                     newParent.addChild(popList[i][1])
                 stack[-toPop:] = [(nextGrammar[0], newParent)]
+            cod_gen(stack[-1][1], nextToken)
             ptResult = parse_table[stack[-2][0]][stack[-1][0]].split('_')
             # todo: find goto in table.json
         flag = True

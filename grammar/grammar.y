@@ -10,8 +10,8 @@ declaration_list: declaration_list declaration
 declaration: var_declaration 
 | fun_declaration 
 ;
-var_declaration: type_specifier s_PID ID ';'
-| type_specifier s_PID ID '[' NUM ']' ';'
+var_declaration: type_specifier s_PID ID ';' s_atomic_var_declaration
+| type_specifier s_PID ID '[' NUM ']' ';' s_array_declaration
 ;
 type_specifier: "int" 
 | "void"
@@ -105,8 +105,6 @@ s_PID : /* epsilon */
 ;
 s_Assign : /* epsilon */
 ;
-s_Save : /* epsilon */
-;
 s_jpf : /* epsilon */
 ;
 s_jpf_save : /* epsilon */
@@ -120,5 +118,9 @@ s_save : /* epsilon */
 s_jmp_to_expr : /* epsilon */
 ;
 s_switch_jf : /* epsilon */
+;
+s_atomic_var_declaration : /* epsilon */
+;
+s_array_declaration : /* epsilon */
 ;
 %%
