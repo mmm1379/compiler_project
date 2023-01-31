@@ -18,10 +18,11 @@ class Row:
         self.scope = scope
 
 
-def getLastVarAddressAndUpdate():
+def getLastVarAddressAndUpdate(newVarLength=1):
     global lastVarAddress
-    lastVarAddress += 4
-    return lastVarAddress - 4
+    temp = lastVarAddress
+    lastVarAddress += 4 * newVarLength
+    return temp
 
 
 def scopeIntro():
@@ -50,30 +51,47 @@ def pop(times=1):
 
 
 def findAddress(token):
-    pass
+    return symbol_table[token].address
 
 
 def var_declaration():
-    address = getLastVarAddressAndUpdate()
-    lexeme = currentNode.children[-3].actualName[1]
+    lexeme = currentNode.children[-2].actualName[1]
     if currentNode.children[0].name == "s_atomic_var_declaration":
+        address = getLastVarAddressAndUpdate()
         row = Row(address, lexeme, False, 0, "int", scope)
     else:
-        length = int(currentNode.children[-5].actualName[1])
+        length = int(currentNode.children[-4].actualName[1])
+        address = getLastVarAddressAndUpdate(length)
         row = Row(address, lexeme, False, length, "array", scope)
     symbol_table[lexeme] = row
 
 
 def fun_declaration():
-    print(currentNode)
+    lexeme = currentNode.children[-2].actualName[1]
+    address = ss[-1]
+    pop()
+    params = currentNode.children[-4].children
+    if params[0].name == 'void':
+        paramLen = 0
+    else:
+        paramLen = len(params)
+
+    symbol_table[lexeme] = Row(address, lexeme, True, paramLen, "func", scope)
 
 
-def atomic_var_declaration():
-    print(currentNode)
+def param():
+    lexeme = currentNode.children[-2].actualName[1]
+    if currentNode.children[0].name == "s_atomic_param_declaration":
+        address = getLastVarAddressAndUpdate()
+        row = Row(address, lexeme, False, 0, "int", scope + 1)
+    else:
+        row = Row(-1, lexeme, False, -1, "array", scope + 1)
+    symbol_table[lexeme] = row
 
 
-def array_declaration():
-    print(currentNode)
+def save_address():
+    push(i())
+    PB.append("")
 
 
 def PID():
@@ -116,16 +134,26 @@ def iteration_stmt():
     pop(3)
 
 
+# def var():
+#     push(findAddress(currentNode.children[-2].actualName[1]))
+
+
+def push_num():
+    push(f"#{int(currentToken)}")
+
+
 def cod_gen(node, token):
     global currentToken, currentNode
-    currentToken = token
+    currentToken = token[1]
     currentNode = node
     action_symbol = node.name
+    func_name = action_symbol
     if action_symbol.startswith("s_"):
-        globals()[action_symbol[2:]]()
-    elif action_symbol in globals():
-        globals()[action_symbol]()
+        func_name = action_symbol[2:]
+    if func_name in globals():
+        globals()[func_name]()
 
 
 def writePB():
-    pass
+    for i in PB:
+        print(i)

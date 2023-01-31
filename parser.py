@@ -1,6 +1,6 @@
 import json
 from scanner import get_next_token
-from code_gen import cod_gen, scopeIntro, scopeOutro
+from code_gen import cod_gen, scopeIntro, scopeOutro, writePB
 
 
 class Node:
@@ -88,7 +88,7 @@ def parseNextToken():
         if not hasSyntaxError:
             syntaxErrorFile.write("There is no syntax error.")
         writeToParseTreeFile()
-
+        writePB()
         return True
     nextTokenDict = get_next_token()
     lineNumber = nextTokenDict["lineNumber"]

@@ -10,22 +10,23 @@ declaration_list: declaration_list declaration
 declaration: var_declaration 
 | fun_declaration 
 ;
-var_declaration: type_specifier s_PID ID ';' s_atomic_var_declaration
-| type_specifier s_PID ID '[' NUM ']' ';' s_array_declaration
+var_declaration: type_specifier ID ';' s_atomic_var_declaration
+| type_specifier ID '[' NUM ']' ';' s_array_declaration
 ;
-type_specifier: "int" 
+type_specifier: "int"
 | "void"
 ;
-fun_declaration: type_specifier s_PID ID '(' params ')' compound_stmt
+fun_declaration: type_specifier ID '(' params ')' s_save_address compound_stmt
 ;
+
 params: param_list
 | "void"
 ;
 param_list: param_list ',' param
 | param
 ;
-param: type_specifier s_PID ID
-| type_specifier s_PID ID '[' ']'
+param: type_specifier ID s_atomic_param_declaration
+| type_specifier ID '[' ']' s_array_param_declaration
 ;
 compound_stmt: '{' local_declarations statement_list '}'
 ;
@@ -91,7 +92,7 @@ mulop: '*'
 factor: '(' expression ')'
 | var
 | call
-| NUM
+| s_push_num NUM
 ;
 call: s_PID ID '(' args ')'
 ;
@@ -123,4 +124,13 @@ s_atomic_var_declaration : /* epsilon */
 ;
 s_array_declaration : /* epsilon */
 ;
+s_atomic_param_declaration : /* epsilon */
+;
+s_array_param_declaration : /* epsilon */
+;
+s_save_address : /* epsilon */
+;
+s_push_num : /* epsilon */
+;
+
 %%

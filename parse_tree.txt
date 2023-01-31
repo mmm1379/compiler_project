@@ -4,13 +4,19 @@ program
 │       └── fun_declaration
 │           ├── type_specifier
 │           │   └── (KEYWORD, void)
-│           ├── s_PID
-│           │   └── epsilon
 │           ├── (ID, main)
 │           ├── (SYMBOL, ()
 │           ├── params
-│           │   └── (KEYWORD, void)
+│           │   └── param_list
+│           │       └── param
+│           │           ├── type_specifier
+│           │           │   └── (KEYWORD, int)
+│           │           ├── (ID, a)
+│           │           └── s_atomic_param_declaration
+│           │               └── epsilon
 │           ├── (SYMBOL, ))
+│           ├── s_save_address
+│           │   └── epsilon
 │           └── compound_stmt
 │               ├── (SYMBOL, {)
 │               ├── local_declarations
@@ -20,17 +26,17 @@ program
 │               │   │   └── var_declaration
 │               │   │       ├── type_specifier
 │               │   │       │   └── (KEYWORD, int)
-│               │   │       ├── s_PID
-│               │   │       │   └── epsilon
-│               │   │       ├── (ID, prod)
-│               │   │       └── (SYMBOL, ;)
+│               │   │       ├── (ID, b)
+│               │   │       ├── (SYMBOL, ;)
+│               │   │       └── s_atomic_var_declaration
+│               │   │           └── epsilon
 │               │   └── var_declaration
 │               │       ├── type_specifier
 │               │       │   └── (KEYWORD, int)
-│               │       ├── s_PID
-│               │       │   └── epsilon
-│               │       ├── (ID, b)
-│               │       └── (SYMBOL, ;)
+│               │       ├── (ID, prod)
+│               │       ├── (SYMBOL, ;)
+│               │       └── s_atomic_var_declaration
+│               │           └── epsilon
 │               ├── statement_list
 │               │   ├── statement_list
 │               │   │   ├── statement_list
@@ -48,7 +54,9 @@ program
 │               │   │           │   │       └── additive_expression
 │               │   │           │   │           └── term
 │               │   │           │   │               └── factor
-│               │   │           │   │                   └── (NUM, 1)
+│               │   │           │   │                   ├── s_push_num
+│               │   │           │   │                   │   └── epsilon
+│               │   │           │   │                   └── (NUM, 2)
 │               │   │           │   └── s_Assign
 │               │   │           │       └── epsilon
 │               │   │           └── (SYMBOL, ;)
@@ -65,6 +73,8 @@ program
 │               │           │   │       └── additive_expression
 │               │           │   │           └── term
 │               │           │   │               └── factor
+│               │           │   │                   ├── s_push_num
+│               │           │   │                   │   └── epsilon
 │               │           │   │                   └── (NUM, 1)
 │               │           │   └── s_Assign
 │               │           │       └── epsilon
