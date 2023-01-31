@@ -55,6 +55,10 @@ def label():
     push(i())
 
 
+def label():
+    ss.append(len(PB))
+
+
 def cod_gen(action_symbol, token):
     global currentToken
     currentToken = token
