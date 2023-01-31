@@ -3,36 +3,56 @@ PB = []
 currentToken = ""
 
 
+def i():
+    return len(PB)
+
+
+def push(x):
+    ss.append(x)
+
+
+def pop():
+    return ss.pop()
+
+
 def findAddress(token):
     pass
 
 
 def PID():
-    ss.append(findAddress(currentToken))
+    push(findAddress(currentToken))
 
 
 def Assign():
     PB.append(f"(ASSIGN, {ss[-1]}, {ss[-2]})")
-    ss.pop()
+    pop()
 
 
 def save():
-    ss.append(len(PB))
+    push(i())
     PB.append("")
 
 
 def jpf():
-    PB[ss[-1]] = f"(JPF, {ss[-2]}, {len(PB)}, "
-    ss.pop()
-    ss.pop()
+    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i()}, "
+    pop()
+    pop()
 
 
 def jpf_save():
-    pass
+    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, "
+    pop()
+    pop()
+    push(i() - 1)
 
 
 def jp():
-    pass
+    PB[ss[-1]] = f"JP, {i()}, , "
+    pop()
+
+
+def label():
+    push(i())
 
 
 def cod_gen(action_symbol, token):
