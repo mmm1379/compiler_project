@@ -54,15 +54,16 @@ def jp():
 def label():
     push(i())
 
-
-def label():
-    ss.append(len(PB))
+def iteration_stmt():
 
 
 def cod_gen(action_symbol, token):
     global currentToken
     currentToken = token
-    globals()[action_symbol[2:]]()
+    if action_symbol.startswith("s_"):
+        globals()[action_symbol[2:]]()
+    else:
+        globals()[action_symbol]()
 
 
 def writePB():
