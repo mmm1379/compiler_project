@@ -10,13 +10,13 @@ declaration_list: declaration_list declaration
 declaration: var_declaration 
 | fun_declaration 
 ;
-var_declaration: type_specifier ID ';' 
-| type_specifier ID '[' NUM ']' ';'
+var_declaration: type_specifier s_PID ID ';'
+| type_specifier s_PID ID '[' NUM ']' ';'
 ;
 type_specifier: "int" 
 | "void"
 ;
-fun_declaration: type_specifier ID '(' params ')' compound_stmt
+fun_declaration: type_specifier s_PID ID '(' params ')' compound_stmt
 ;
 params: param_list
 | "void"
@@ -24,8 +24,8 @@ params: param_list
 param_list: param_list ',' param
 | param
 ;
-param: type_specifier ID
-| type_specifier ID '[' ']'
+param: type_specifier s_PID ID
+| type_specifier s_PID ID '[' ']'
 ;
 compound_stmt: '{' local_declarations statement_list '}'
 ;
@@ -46,8 +46,8 @@ expression_stmt: expression ';'
 | "break" ';'
 | ';'
 ;
-selection_stmt: "if" '(' expression ')' statement "endif"
-| "if" '(' expression ')' statement "else" statement "endif"
+selection_stmt: "if" '(' expression ')' s_save statement s_jpf "endif"
+| "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
 ;
 iteration_stmt: "while" '(' expression ')' statement
 ;
@@ -64,11 +64,11 @@ case_stmt: "case" NUM ':' statement_list
 default_stmt: "default" ':' statement_list
 | /* epsilon */
 ;
-expression: var '=' expression
+expression: var '=' expression s_Assign
 | simple_expression
 ;
-var: ID
-| ID '[' expression ']'
+var: s_PID ID
+| s_PID ID '[' expression ']'
 ;
 simple_expression: additive_expression relop additive_expression
 | additive_expression
@@ -93,12 +93,32 @@ factor: '(' expression ')'
 | call
 | NUM
 ;
-call: ID '(' args ')'
+call: s_PID ID '(' args ')'
 ;
 args: arg_list
 | /* epsilon */
 ;
 arg_list: arg_list ',' expression
 | expression
+;
+s_PID : /* epsilon */
+;
+s_Assign : /* epsilon */
+;
+s_Save : /* epsilon */
+;
+s_jpf : /* epsilon */
+;
+s_jpf_save : /* epsilon */
+;
+s_jp : /* epsilon */
+;
+s_label : /* epsilon */
+;
+s_save : /* epsilon */
+;
+s_jmp_to_expr : /* epsilon */
+;
+s_switch_jf : /* epsilon */
 ;
 %%
