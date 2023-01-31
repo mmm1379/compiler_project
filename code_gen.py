@@ -41,14 +41,14 @@ def jpf():
 
 
 def jpf_save():
-    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, "
+    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, )"
     pop()
     pop()
     push(i() - 1)
 
 
 def jp():
-    PB[ss[-1]] = f"JP, {i()}, , "
+    PB[ss[-1]] = f"(JP, {i()}, , )"
     pop()
 
 
@@ -56,6 +56,9 @@ def label():
     push(i())
 
 def iteration_stmt():
+    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, )"
+    PB[i()] = f"(JP, {ss[-3]}, , )"
+    pop(3)
 
 
 
