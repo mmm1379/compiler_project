@@ -54,12 +54,12 @@ iteration_stmt: "while" s_label '(' expression ')' s_save statement
 return_stmt: "return" ';'
 | "return" expression ';'
 ;
-switch_stmt: "switch" '(' expression ')' '{' case_stmts default_stmt '}'
+switch_stmt: s_save s_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
 ;
 case_stmts: case_stmts case_stmt
 | /* epsilon */
 ;
-case_stmt: "case" NUM ':' statement_list
+case_stmt: "case" NUM s_switch_jf ':' statement_list
 ;
 default_stmt: "default" ':' statement_list
 | /* epsilon */

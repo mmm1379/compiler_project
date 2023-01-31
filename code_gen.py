@@ -11,8 +11,9 @@ def push(x):
     ss.append(x)
 
 
-def pop():
-    return ss.pop()
+def pop(times = 1):
+    for _ in range(times):
+        ss.pop()
 
 
 def findAddress(token):
@@ -55,6 +56,8 @@ def label():
     push(i())
 
 def iteration_stmt():
+
+
 
 
 def cod_gen(action_symbol, token):
