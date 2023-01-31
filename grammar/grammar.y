@@ -49,7 +49,7 @@ expression_stmt: expression ';'
 selection_stmt: "if" '(' expression ')' s_save statement s_jpf "endif"
 | "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
 ;
-iteration_stmt: "while" '(' expression ')' statement
+iteration_stmt: "while" s_label '(' expression ')' s_save statement
 ;
 return_stmt: "return" ';'
 | "return" expression ';'
