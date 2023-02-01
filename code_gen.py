@@ -1,5 +1,5 @@
 ss = []
-PB = []
+PB = [""]
 currentToken = ""
 currentNode = None
 scope = 0
@@ -69,6 +69,8 @@ def var_declaration():
 def fun_declaration():
     lexeme = currentNode.children[-2].actualName[1]
     address = ss[-1]
+    if lexeme == 'main' and not scope:
+        PB[0] = f"(JP, {address}, , )"
     pop()
     params = currentNode.children[-4].children
     if params[0].name == 'void':
@@ -89,17 +91,12 @@ def param():
     symbol_table[lexeme] = row
 
 
-def save_address():
-    push(i())
-    PB.append("")
-
-
 def PID():
     push(findAddress(currentToken))
 
 
 def Assign():
-    PB.append(f"(ASSIGN, {ss[-1]}, {ss[-2]})")
+    PB.append(f"(ASSIGN, {ss[-1]}, {ss[-2]}, )")
     pop()
 
 
@@ -108,8 +105,36 @@ def save():
     PB.append("")
 
 
+def switch_save():
+    save()
+    save()
+
+
+def jmp_to_expr():
+    PB[ss[-2]] = f"(JP, {i()}, , )"
+
+
+def switch_jf():
+    t = getLastVarAddressAndUpdate()
+    PB.append(f"(EQ, #{int(currentToken)}, {ss[-1]}, {t})")
+    save()
+    push(t)
+
+
+def case_stmt():
+    PB[ss[-2]] = f"(JPF, {ss[-1]}, {i()+1}, )"
+    pop(2)
+    PB.append(f"(JP, {ss[-2]}, , )")
+
+
+def switch_stmt():
+    pop()
+    PB[ss[-1]] = f"(JP, {i()})"
+    pop(2)
+
+
 def jpf():
-    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i()}, "
+    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i()}, )"
     pop(2)
 
 
@@ -128,14 +153,20 @@ def label():
     push(i())
 
 
+def pop_stack():
+    pop()
+
+
 def iteration_stmt():
     PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, )"
-    PB[i()] = f"(JP, {ss[-3]}, , )"
+    PB.append(f"(JP, {ss[-3]}, , )")
     pop(3)
 
 
-# def var():
-#     push(findAddress(currentNode.children[-2].actualName[1]))
+def call():
+    address = findAddress(currentNode.children[-2].actualName[1])
+    PB.append(f"(JP, {address}, , )")
+    # push(i())
 
 
 def push_num():
@@ -155,5 +186,5 @@ def cod_gen(node, token):
 
 
 def writePB():
-    for i in PB:
-        print(i)
+    for i,x in enumerate(PB):
+        print(f"{i}.\t{x}")

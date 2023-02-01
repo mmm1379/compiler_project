@@ -1,6 +1,14 @@
 void main(int a){
-	int prod;
 	int b;
-	prod = 1;
-	b = 1;
+    switch (b) {
+      case 1:
+        b = 1;
+      case 4:
+        b = 2;
+      case 4:
+        b = 3;
+      default:
+        b = 4;
+    }
+
 }
