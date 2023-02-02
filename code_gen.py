@@ -8,7 +8,11 @@ class Row:
         self.scope = scope
         if self.function:
             self.returnAddress = getLastVarAddressAndUpdate()
-            self.args = list(symbol_table.values())[-length:]
+            args = []
+            for i in range(length):
+                args.append(ss[-1])
+                pop()
+            self.args = args[::-1]
 
 
 ss = []
@@ -101,11 +105,12 @@ def fun_declaration():
 
 def param():
     lexeme = currentNode.children[-2].actualName[1]
+    address = getLastVarAddressAndUpdate()
     if currentNode.children[0].name == "s_atomic_param_declaration":
-        address = getLastVarAddressAndUpdate()
         row = Row(address, lexeme, False, 0, "int", scope + 1)
     else:
-        row = Row(-1, lexeme, False, -1, "array", scope + 1)
+        row = Row(address, lexeme, False, -1, "array", scope + 1)
+    push(address)
     symbol_table[lexeme] = row
 
 
@@ -190,7 +195,7 @@ def call():
     fRow = symbol_table[fName]
     address = fRow.address
     for j, arg in enumerate(fRow.args[::-1]):
-        PB.append(f"(ASSIGN, {ss[-(j + 1)]}, {arg.address}, )")
+        PB.append(f"(ASSIGN, {ss[-(j + 1)]}, {arg}, )")
     pop(len(fRow.args))
     PB.append(f"(ASSIGN, #{i() + 2}, {fRow.returnAddress}, )")
     PB.append(f"(JP, {address}, , )")

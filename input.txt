@@ -1,11 +1,16 @@
-int f1(int a, int b){
-    int c;
+int f1(int l, int m){
+    int d;
+    d = l+m;
+    output(d);
 }
 
 
-void main(int a){
+void main(void){
 	int b;
+	int c;
+	c = 2;
+	b = 1;
     b = b + 4;
-    f1(a, b);
+    f1(b,c);
     output(b);
 }

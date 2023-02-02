@@ -10,8 +10,10 @@
 10.	return
 11.	endif
 12.	f1
-13.	a
-14.	b
-15.	c
-16.	main
-17.	output
+13.	l
+14.	m
+15.	d
+16.	output
+17.	main
+18.	b
+19.	c
