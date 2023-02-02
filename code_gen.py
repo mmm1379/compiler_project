@@ -1,13 +1,3 @@
-ss = []
-PB = [""]
-currentToken = ""
-currentNode = None
-scope = 0
-symbol_table = {}
-lastVarAddress = 0
-lastTempAddress = 0
-
-
 class Row:
     def __init__(self, address, lexeme, function, length, type, scope):
         self.address = address
@@ -16,6 +6,19 @@ class Row:
         self.length = length
         self.type = type
         self.scope = scope
+        if self.function:
+            self.returnAddress = getLastVarAddressAndUpdate()
+            self.args = list(symbol_table.values())[-length:]
+
+
+ss = []
+PB = [""]
+currentToken = ""
+currentNode = None
+scope = 0
+symbol_table = {"output": Row(0,0,0,0,0,0)}
+lastVarAddress = 0
+lastTempAddress = 0
 
 
 def getLastVarAddressAndUpdate(newVarLength=1):
@@ -66,6 +69,14 @@ def var_declaration():
     symbol_table[lexeme] = row
 
 
+def getParamsNonRecursive(node, ps):
+    if node.actualName != "param_list":
+        return
+    ps.append(node.children[0])
+    if len(node.children) != 1:
+        getParamsNonRecursive(node.children[2], ps)
+
+
 def fun_declaration():
     lexeme = currentNode.children[-2].actualName[1]
     address = ss[-1]
@@ -76,9 +87,16 @@ def fun_declaration():
     if params[0].name == 'void':
         paramLen = 0
     else:
+        ps = []
+        getParamsNonRecursive(params[0], ps)
+        params = ps
         paramLen = len(params)
 
     symbol_table[lexeme] = Row(address, lexeme, True, paramLen, "func", scope)
+
+    if lexeme == 'main' and not scope:
+        return
+    PB.append(f"(JP, @{symbol_table[lexeme].returnAddress}, , )")
 
 
 def param():
@@ -122,7 +140,7 @@ def switch_jf():
 
 
 def case_stmt():
-    PB[ss[-2]] = f"(JPF, {ss[-1]}, {i()+1}, )"
+    PB[ss[-2]] = f"(JPF, {ss[-1]}, {i() + 1}, )"
     pop(2)
     PB.append(f"(JP, {ss[-2]}, , )")
 
@@ -164,13 +182,68 @@ def iteration_stmt():
 
 
 def call():
-    address = findAddress(currentNode.children[-2].actualName[1])
+    fName = currentNode.children[-2].actualName[1]
+    if fName == "output":
+        PB.append(f"(PRINT, {ss[-1]}, , )")
+        pop()
+        return
+    fRow = symbol_table[fName]
+    address = fRow.address
+    for j, arg in enumerate(fRow.args[::-1]):
+        PB.append(f"(ASSIGN, {ss[-(j + 1)]}, {arg.address}, )")
+    pop(len(fRow.args))
+    PB.append(f"(ASSIGN, #{i() + 2}, {fRow.returnAddress}, )")
     PB.append(f"(JP, {address}, , )")
     # push(i())
 
 
 def push_num():
     push(f"#{int(currentToken)}")
+
+
+def additive_expression():
+    if len(currentNode.children) == 3:
+        operation = currentNode.children[1].children[0].actualName[1]
+        t = getLastVarAddressAndUpdate()
+        if operation == '+':
+            PB.append(f"(ADD, {ss[-2]}, {ss[-1]}, {t})")
+        if operation == '-':
+            PB.append(f"(SUB, {ss[-2]}, {ss[-1]}, {t})")
+        pop(2)
+        push(t)
+
+
+def term():
+    if len(currentNode.children) == 3:
+        operation = currentNode.children[1].children[0].actualName[1]
+        t = getLastVarAddressAndUpdate()
+        if operation == '*':
+            PB.append(f"(MULT, {ss[-2]}, {ss[-1]}, {t})")
+        if operation == '/':
+            PB.append(f"(DIV, {ss[-2]}, {ss[-1]}, {t})")
+        pop(2)
+        push(t)
+
+
+def simple_expression():
+    if len(currentNode.children) == 3:
+        operation = currentNode.children[1].children[0].actualName[1]
+        t = getLastVarAddressAndUpdate()
+        if operation == '<':
+            PB.append(f"(LT, {ss[-2]}, {ss[-1]}, {t})")
+        if operation == '==':
+            PB.append(f"(EQ, {ss[-2]}, {ss[-1]}, {t})")
+        pop(2)
+        push(t)
+
+
+def array_select():
+    t1 = getLastVarAddressAndUpdate()
+    t2 = getLastVarAddressAndUpdate()
+    PB.append(f"(MULT, {ss[-1]}, #4, {t2})")
+    PB.append(f"(ADD, {ss[-2]}, {t2}, {t1})")
+    pop(2)
+    push(f"@{t1}")
 
 
 def cod_gen(node, token):
@@ -186,5 +259,8 @@ def cod_gen(node, token):
 
 
 def writePB():
-    for i,x in enumerate(PB):
-        print(f"{i}.\t{x}")
+    text_file = open("output.txt", "w")
+    for i, x in enumerate(PB):
+        print(f"{i}\t{x}")
+        text_file.write(f"{i}\t{x}\n")
+    text_file.close()

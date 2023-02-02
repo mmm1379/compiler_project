@@ -68,7 +68,7 @@ Grammar
    43           | simple_expression
 
    44 var: s_PID ID
-   45    | s_PID ID '[' expression ']'
+   45    | s_PID ID '[' expression ']' s_array_select
 
    46 simple_expression: additive_expression relop additive_expression
    47                  | additive_expression
@@ -132,6 +132,8 @@ Grammar
    81 s_pop_stack: ε
 
    82 s_switch_save: ε
+
+   83 s_array_select: ε
 
 
 Terminals, with rules where they appear
@@ -320,6 +322,9 @@ Nonterminals, with rules where they appear
     s_switch_save (81)
         on left: 82
         on right: 36
+    s_array_select (82)
+        on left: 83
+        on right: 45
 
 
 State 0
@@ -726,7 +731,7 @@ State 39
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -795,7 +800,7 @@ State 42
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -866,7 +871,7 @@ State 47
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1024,7 +1029,7 @@ State 61
 State 62
 
    44 var: s_PID • ID
-   45    | s_PID • ID '[' expression ']'
+   45    | s_PID • ID '[' expression ']' s_array_select
    62 call: s_PID • ID '(' args ')'
 
     ID  shift, and go to state 82
@@ -1065,7 +1070,7 @@ State 67
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1133,7 +1138,7 @@ State 72
    42           | var '=' • expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1195,7 +1200,7 @@ State 76
 State 77
 
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: additive_expression relop • additive_expression
    50 additive_expression: • additive_expression addop term
    51                    | • term
@@ -1226,7 +1231,7 @@ State 77
 State 78
 
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    50 additive_expression: additive_expression addop • term
    54 term: • term mulop factor
    55     | • factor
@@ -1268,7 +1273,7 @@ State 80
 State 81
 
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    54 term: term mulop • factor
    58 factor: • '(' expression ')'
    59       | • var
@@ -1293,7 +1298,7 @@ State 81
 State 82
 
    44 var: s_PID ID •  [';', ']', ')', ',', '=', '<', "==", '+', '-', '*', '/']
-   45    | s_PID ID • '[' expression ']'
+   45    | s_PID ID • '[' expression ']' s_array_select
    62 call: s_PID ID • '(' args ')'
 
     '['  shift, and go to state 95
@@ -1337,7 +1342,7 @@ State 87
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1441,8 +1446,8 @@ State 95
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
-   45    | s_PID ID '[' • expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
+   45    | s_PID ID '[' • expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1478,7 +1483,7 @@ State 96
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1554,7 +1559,7 @@ State 100
 
 State 101
 
-   45 var: s_PID ID '[' expression • ']'
+   45 var: s_PID ID '[' expression • ']' s_array_select
 
     ']'  shift, and go to state 108
 
@@ -1589,7 +1594,7 @@ State 105
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1643,7 +1648,7 @@ State 106
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1702,9 +1707,12 @@ State 107
 
 State 108
 
-   45 var: s_PID ID '[' expression ']' •
+   45 var: s_PID ID '[' expression ']' • s_array_select
+   83 s_array_select: ε •
 
-    $default  reduce using rule 45 (var)
+    $default  reduce using rule 83 (s_array_select)
+
+    s_array_select  go to state 114
 
 
 State 109
@@ -1719,7 +1727,7 @@ State 110
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1740,7 +1748,7 @@ State 110
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    expression           go to state 114
+    expression           go to state 115
     var                  go to state 56
     simple_expression    go to state 57
     additive_expression  go to state 58
@@ -1755,7 +1763,7 @@ State 111
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression • ')' '{' case_stmts default_stmt '}'
 
-    ')'  shift, and go to state 115
+    ')'  shift, and go to state 116
 
 
 State 112
@@ -1764,11 +1772,11 @@ State 112
    32               | "if" '(' expression ')' s_save statement • "else" s_jpf_save statement s_jp "endif"
    69 s_jpf: ε •  ["endif"]
 
-    "else"  shift, and go to state 116
+    "else"  shift, and go to state 117
 
     $default  reduce using rule 69 (s_jpf)
 
-    s_jpf  go to state 117
+    s_jpf  go to state 118
 
 
 State 113
@@ -1793,7 +1801,7 @@ State 113
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1822,7 +1830,7 @@ State 113
     $default  reduce using rule 67 (s_PID)
 
     compound_stmt        go to state 48
-    statement            go to state 118
+    statement            go to state 119
     expression_stmt      go to state 50
     selection_stmt       go to state 51
     iteration_stmt       go to state 52
@@ -1842,43 +1850,50 @@ State 113
 
 State 114
 
+   45 var: s_PID ID '[' expression ']' s_array_select •
+
+    $default  reduce using rule 45 (var)
+
+
+State 115
+
    65 arg_list: arg_list ',' expression •
 
     $default  reduce using rule 65 (arg_list)
 
 
-State 115
+State 116
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' • '{' case_stmts default_stmt '}'
 
-    '{'  shift, and go to state 119
+    '{'  shift, and go to state 120
 
 
-State 116
+State 117
 
    32 selection_stmt: "if" '(' expression ')' s_save statement "else" • s_jpf_save statement s_jp "endif"
    70 s_jpf_save: ε •
 
     $default  reduce using rule 70 (s_jpf_save)
 
-    s_jpf_save  go to state 120
-
-
-State 117
-
-   31 selection_stmt: "if" '(' expression ')' s_save statement s_jpf • "endif"
-
-    "endif"  shift, and go to state 121
+    s_jpf_save  go to state 121
 
 
 State 118
+
+   31 selection_stmt: "if" '(' expression ')' s_save statement s_jpf • "endif"
+
+    "endif"  shift, and go to state 122
+
+
+State 119
 
    33 iteration_stmt: "while" s_label '(' expression ')' s_save statement •
 
     $default  reduce using rule 33 (iteration_stmt)
 
 
-State 119
+State 120
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' • case_stmts default_stmt '}'
    37 case_stmts: • case_stmts case_stmt
@@ -1886,10 +1901,10 @@ State 119
 
     $default  reduce using rule 38 (case_stmts)
 
-    case_stmts  go to state 122
+    case_stmts  go to state 123
 
 
-State 120
+State 121
 
    17 compound_stmt: • '{' local_declarations statement_list '}'
    22 statement: • expression_stmt
@@ -1911,7 +1926,7 @@ State 120
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -1940,7 +1955,7 @@ State 120
     $default  reduce using rule 67 (s_PID)
 
     compound_stmt        go to state 48
-    statement            go to state 123
+    statement            go to state 124
     expression_stmt      go to state 50
     selection_stmt       go to state 51
     iteration_stmt       go to state 52
@@ -1958,14 +1973,14 @@ State 120
     s_switch_save        go to state 64
 
 
-State 121
+State 122
 
    31 selection_stmt: "if" '(' expression ')' s_save statement s_jpf "endif" •
 
     $default  reduce using rule 31 (selection_stmt)
 
 
-State 122
+State 123
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts • default_stmt '}'
    37 case_stmts: case_stmts • case_stmt
@@ -1973,71 +1988,71 @@ State 122
    40 default_stmt: • "default" ':' statement_list
    41             | ε •  ['}']
 
-    "case"     shift, and go to state 124
-    "default"  shift, and go to state 125
+    "case"     shift, and go to state 125
+    "default"  shift, and go to state 126
 
     $default  reduce using rule 41 (default_stmt)
 
-    case_stmt     go to state 126
-    default_stmt  go to state 127
+    case_stmt     go to state 127
+    default_stmt  go to state 128
 
 
-State 123
+State 124
 
    32 selection_stmt: "if" '(' expression ')' s_save statement "else" s_jpf_save statement • s_jp "endif"
    71 s_jp: ε •
 
     $default  reduce using rule 71 (s_jp)
 
-    s_jp  go to state 128
+    s_jp  go to state 129
 
 
-State 124
+State 125
 
    39 case_stmt: "case" • s_switch_jf NUM ':' statement_list
    75 s_switch_jf: ε •
 
     $default  reduce using rule 75 (s_switch_jf)
 
-    s_switch_jf  go to state 129
-
-
-State 125
-
-   40 default_stmt: "default" • ':' statement_list
-
-    ':'  shift, and go to state 130
+    s_switch_jf  go to state 130
 
 
 State 126
+
+   40 default_stmt: "default" • ':' statement_list
+
+    ':'  shift, and go to state 131
+
+
+State 127
 
    37 case_stmts: case_stmts case_stmt •
 
     $default  reduce using rule 37 (case_stmts)
 
 
-State 127
+State 128
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt • '}'
 
-    '}'  shift, and go to state 131
-
-
-State 128
-
-   32 selection_stmt: "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp • "endif"
-
-    "endif"  shift, and go to state 132
+    '}'  shift, and go to state 132
 
 
 State 129
 
-   39 case_stmt: "case" s_switch_jf • NUM ':' statement_list
+   32 selection_stmt: "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp • "endif"
 
-    NUM  shift, and go to state 133
+    "endif"  shift, and go to state 133
 
 
 State 130
+
+   39 case_stmt: "case" s_switch_jf • NUM ':' statement_list
+
+    NUM  shift, and go to state 134
+
+
+State 131
 
    20 statement_list: • statement_list statement
    21               | ε •
@@ -2045,31 +2060,31 @@ State 130
 
     $default  reduce using rule 21 (statement_list)
 
-    statement_list  go to state 134
+    statement_list  go to state 135
 
 
-State 131
+State 132
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}' •
 
     $default  reduce using rule 36 (switch_stmt)
 
 
-State 132
+State 133
 
    32 selection_stmt: "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif" •
 
     $default  reduce using rule 32 (selection_stmt)
 
 
-State 133
+State 134
 
    39 case_stmt: "case" s_switch_jf NUM • ':' statement_list
 
-    ':'  shift, and go to state 135
+    ':'  shift, and go to state 136
 
 
-State 134
+State 135
 
    17 compound_stmt: • '{' local_declarations statement_list '}'
    20 statement_list: statement_list • statement
@@ -2092,7 +2107,7 @@ State 134
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term
@@ -2140,7 +2155,7 @@ State 134
     s_switch_save        go to state 64
 
 
-State 135
+State 136
 
    20 statement_list: • statement_list statement
    21               | ε •
@@ -2148,10 +2163,10 @@ State 135
 
     $default  reduce using rule 21 (statement_list)
 
-    statement_list  go to state 136
+    statement_list  go to state 137
 
 
-State 136
+State 137
 
    17 compound_stmt: • '{' local_declarations statement_list '}'
    20 statement_list: statement_list • statement
@@ -2174,7 +2189,7 @@ State 136
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']'
+   45    | • s_PID ID '[' expression ']' s_array_select
    46 simple_expression: • additive_expression relop additive_expression
    47                  | • additive_expression
    50 additive_expression: • additive_expression addop term

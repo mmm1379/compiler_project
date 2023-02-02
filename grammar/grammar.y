@@ -69,7 +69,7 @@ expression: var '=' expression s_Assign
 | simple_expression
 ;
 var: s_PID ID
-| s_PID ID '[' expression ']'
+| s_PID ID '[' expression ']' s_array_select
 ;
 simple_expression: additive_expression relop additive_expression
 | additive_expression
@@ -94,6 +94,7 @@ factor: '(' expression ')'
 | call
 | s_push_num NUM
 ;
+
 call: s_PID ID '(' args ')'
 ;
 args: arg_list
@@ -133,6 +134,8 @@ s_push_num : /* epsilon */
 s_pop_stack : /* epsilon */
 ;
 s_switch_save : /* epsilon */
+;
+s_array_select : /* epsilon */
 ;
 
 %%

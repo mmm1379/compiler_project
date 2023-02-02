@@ -9,6 +9,9 @@
 9.	case
 10.	return
 11.	endif
-12.	main
+12.	f1
 13.	a
 14.	b
+15.	c
+16.	main
+17.	output
