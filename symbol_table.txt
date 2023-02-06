@@ -13,7 +13,8 @@
 13.	l
 14.	m
 15.	d
-16.	output
-17.	main
-18.	b
-19.	c
+16.	main
+17.	b
+18.	c
+19.	p
+20.	output

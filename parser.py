@@ -1,6 +1,6 @@
 import json
 from scanner import get_next_token
-from code_gen import cod_gen, scopeIntro, scopeOutro, writePB
+from code_gen import cod_gen, scopeIntro, scopeOutro, finishSemantic
 
 
 class Node:
@@ -88,7 +88,7 @@ def parseNextToken():
         if not hasSyntaxError:
             syntaxErrorFile.write("There is no syntax error.")
         writeToParseTreeFile()
-        writePB()
+        finishSemantic()
         return True
     nextTokenDict = get_next_token()
     lineNumber = nextTokenDict["lineNumber"]
@@ -172,7 +172,7 @@ def parseNextToken():
                 for i in range(len(popList) - 2, -1, -2):
                     newParent.addChild(popList[i][1])
                 stack[-toPop:] = [(nextGrammar[0], newParent)]
-            cod_gen(stack[-1][1], nextToken)
+            cod_gen(stack[-1][1], nextToken, lineNumber)
             ptResult = parse_table[stack[-2][0]][stack[-1][0]].split('_')
             # todo: find goto in table.json
         flag = True

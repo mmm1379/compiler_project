@@ -6,6 +6,7 @@ class Row:
         self.length = length
         self.type = type
         self.scope = scope
+        self.args = []
         if self.function:
             self.returnAddress = getLastVarAddressAndUpdate()
             args = []
@@ -19,10 +20,16 @@ ss = []
 PB = [""]
 currentToken = ""
 currentNode = None
+lineNumber = 0
 scope = 0
-symbol_table = {"output": Row(0,0,0,0,0,0)}
+symbol_table = {"output": Row(-1, 0, 0, 0, 0, 0)}
 lastVarAddress = 0
 lastTempAddress = 0
+
+scopeStack = []
+
+hasSemanticError = False
+semanticErrorFile = open("semantic_errors.txt", "w")
 
 
 def getLastVarAddressAndUpdate(newVarLength=1):
@@ -35,13 +42,11 @@ def getLastVarAddressAndUpdate(newVarLength=1):
 def scopeIntro():
     global scope
     scope += 1
-    pass
 
 
 def scopeOutro():
     global scope
     scope -= 1
-    pass
 
 
 def i():
@@ -129,6 +134,7 @@ def save():
 
 
 def switch_save():
+    scopeStack.append("breakStmt")
     save()
     save()
 
@@ -151,9 +157,14 @@ def case_stmt():
 
 
 def switch_stmt():
+    scopeStack.pop()
     pop()
     PB[ss[-1]] = f"(JP, {i()})"
     pop(2)
+
+
+def push_scope_stack():
+    scopeStack.append("breakStmt")
 
 
 def jpf():
@@ -181,6 +192,7 @@ def pop_stack():
 
 
 def iteration_stmt():
+    scopeStack.pop()
     PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, )"
     PB.append(f"(JP, {ss[-3]}, , )")
     pop(3)
@@ -192,6 +204,7 @@ def call():
         PB.append(f"(PRINT, {ss[-1]}, , )")
         pop()
         return
+
     fRow = symbol_table[fName]
     address = fRow.address
     for j, arg in enumerate(fRow.args[::-1]):
@@ -251,21 +264,176 @@ def array_select():
     push(f"@{t1}")
 
 
-def cod_gen(node, token):
-    global currentToken, currentNode
+def cod_gen(node, token, lN):
+    global currentToken, currentNode, lineNumber
     currentToken = token[1]
     currentNode = node
+    lineNumber = lN
     action_symbol = node.name
     func_name = action_symbol
     if action_symbol.startswith("s_"):
         func_name = action_symbol[2:]
     if func_name in globals():
+        checkInputForErrors(func_name)
         globals()[func_name]()
+
+
+def checkInputForErrors(func_name):
+    result = True
+    if func_name in ["call", "PID"]:
+        result &= checkScopingError(func_name)
+    if result and func_name == "var_declaration":
+        result &= checkDeclarationNotVoid()
+    if result and func_name == "call":
+        result &= checkFunctionParameters()
+    if result and func_name == "check_break":
+        result &= checkCorrectBreak()
+    if result and func_name in ["simple_expression", "additive_expression", "term"]:
+        result &= checkTypeEquals()
+
+
+def checkScopingError(func_name):
+    if func_name == "call":
+        symbolName = currentNode.children[-2].actualName[1]
+    else:
+        symbolName = currentToken
+
+    if symbolName not in symbol_table:
+        writeSemanticError(f"'{symbolName}' is not defined")
+        return False
+    return True
+
+
+def checkDeclarationNotVoid():
+    typeSpecifier = currentNode.children[-1].children[0].actualName[1]
+    lexeme = currentNode.children[-2].actualName[1]
+    if typeSpecifier == "void":
+        writeSemanticError(f"'Illegal type of void for '{lexeme}'")
+        return False
+    return True
+
+
+def checkFunctionParameters():
+    fName = currentNode.children[-2].actualName[1]
+    if fName == "output":
+        return True
+    fRow = symbol_table[fName]
+    argsNode = currentNode.children[-4]
+    argList = []
+    if argsNode.children[0].actualName != "epsilon":
+        pass
+    tempNode = argsNode.children[0]
+    while tempNode.actualName == "arg_list":
+        argList.append(tempNode.children[0])
+        tempNode = tempNode.children[-1]
+    result = checkParamLenMatch(argList, fRow)
+    result &= checkParamTypeMatch(argList, fRow)
+    return result
+
+
+def checkParamLenMatch(argList, fRow):
+    if len(argList) != len(fRow.args):
+        writeSemanticError(f"Mismatch in numbers of arguments of '{fRow.lexeme}'")
+        return False
+    return True
+
+
+def findRowByAddress(address):
+    for row in symbol_table.values():
+        if row.address == address:
+            return row
+    return None
+
+
+def checkParamTypeMatch(argList, fRow):
+    returnValue = True
+    for i, arg in enumerate(argList[::-1]):
+        argRow = findRowByAddress(ss[-(len(argList) - i)])
+        trueFuncArgType = findRowByAddress(fRow.args[i]).type
+
+        if argRow.type != trueFuncArgType:
+            writeSemanticError(f"Mismatch in type of argument {i + 1} of '{fRow.lexeme}'. Expected '{trueFuncArgType}' "
+                               f"but got '{argRow.type}' instead")
+            returnValue = False
+    return returnValue
+
+
+def checkCorrectBreak():
+    if not len(scopeStack):
+        writeSemanticError("No 'while' or 'switch case' found for 'break'")
+        return False
+    return True
+
+
+def checkTypeEquals():
+    if len(currentNode.children) != 3:
+        return True
+
+    def findChildFactor(node):
+        if node.actualName == "factor":
+            return node
+        return findChildFactor(node.children[0])
+
+    def getType(factor):
+        def getVarType(var):
+            if len(var.children) == 2:
+                lexeme = var.children[0].actualName[1]
+                return symbol_table[lexeme].type
+            else:
+                return "int"
+
+        # def getCallType(call):
+        #     pass
+
+        def getExpressionType(expression):
+            if len(expression.children) == 4:
+                return getVarType(expression.children[-1])
+            else:
+                return getType(findChildFactor(expression.children[0]))
+
+        if len(factor.children) == 1:
+            if factor.children[0].actualName == "var":
+                return getVarType(factor.children[0])
+            # else:
+            #     return getCallType(factor.children[0])
+        elif len(factor.children) == 2:
+            return "int"
+        else:
+            return getExpressionType(factor.children[0].children[1])
+
+    type1 = getType(findChildFactor(currentNode.children[0]))
+    type2 = getType(findChildFactor(currentNode.children[2]))
+
+    if type1 != type2:
+        writeSemanticError(f"Type mismatch in operands, Got {type2} instead of {type1}")
+        return False
+    return True
+
+
+def writeSemanticError(toWrite):
+    semanticErrorFile.write(f"# {lineNumber} : Semantic Error! {toWrite}.\n")
+    global hasSemanticError
+    hasSemanticError = True
+
+
+def finishSemantic():
+    checkIfFileContainedErrors()
+    semanticErrorFile.close()
+    if not hasSemanticError:
+        writePB()
+
+
+def checkIfFileContainedErrors():
+    if not hasSemanticError:
+        semanticErrorFile.write("The input program is semantically correct.")
 
 
 def writePB():
     text_file = open("output.txt", "w")
-    for i, x in enumerate(PB):
-        print(f"{i}\t{x}")
-        text_file.write(f"{i}\t{x}\n")
+    if hasSemanticError:
+        text_file.write(f"The output code has not been generated")
+    else:
+        for i, x in enumerate(PB):
+            print(f"{i}\t{x}")
+            text_file.write(f"{i}\t{x}\n")
     text_file.close()
