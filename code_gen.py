@@ -175,8 +175,7 @@ def jpf():
 def jpf_save():
     PB[ss[-1]] = f"(JPF, {ss[-2]}, {i()+1}, )"
     pop(2)
-    push(i())
-    PB.append("")
+    push(i() - 1)
 
 
 def jp():
