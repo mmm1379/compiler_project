@@ -173,9 +173,10 @@ def jpf():
 
 
 def jpf_save():
-    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, )"
+    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i()+1}, )"
     pop(2)
-    push(i() - 1)
+    push(i())
+    PB.append("")
 
 
 def jp():
@@ -419,8 +420,7 @@ def writeSemanticError(toWrite):
 def finishSemantic():
     checkIfFileContainedErrors()
     semanticErrorFile.close()
-    if not hasSemanticError:
-        writePB()
+    writePB()
 
 
 def checkIfFileContainedErrors():
@@ -434,6 +434,6 @@ def writePB():
         text_file.write(f"The output code has not been generated")
     else:
         for i, x in enumerate(PB):
-            print(f"{i}\t{x}")
+            # print(f"{i}\t{x}")
             text_file.write(f"{i}\t{x}\n")
     text_file.close()

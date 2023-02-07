@@ -1,1 +1,1 @@
-# 13 : Semantic Error! Mismatch in type of argument 2 of 'f1'. Expected 'int' but got 'array' instead.
+The input program is semantically correct.
