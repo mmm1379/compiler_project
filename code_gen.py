@@ -407,7 +407,7 @@ def checkTypeEquals():
         elif len(factor.children) == 2:
             return "int"
         else:
-            return getExpressionType(factor.children[0].children[1])
+            return getExpressionType(factor.children[1])
 
     type1 = getType(findChildFactor(currentNode.children[0]))
     type2 = getType(findChildFactor(currentNode.children[2]))

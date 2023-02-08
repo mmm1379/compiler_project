@@ -15,18 +15,75 @@ program
 │               ├── (SYMBOL, {)
 │               ├── local_declarations
 │               │   ├── local_declarations
-│               │   │   └── epsilon
+│               │   │   ├── local_declarations
+│               │   │   │   ├── local_declarations
+│               │   │   │   │   ├── local_declarations
+│               │   │   │   │   │   ├── local_declarations
+│               │   │   │   │   │   │   └── epsilon
+│               │   │   │   │   │   └── var_declaration
+│               │   │   │   │   │       ├── type_specifier
+│               │   │   │   │   │       │   └── (KEYWORD, int)
+│               │   │   │   │   │       ├── (ID, arr)
+│               │   │   │   │   │       ├── (SYMBOL, [)
+│               │   │   │   │   │       ├── (NUM, 20)
+│               │   │   │   │   │       ├── (SYMBOL, ])
+│               │   │   │   │   │       ├── (SYMBOL, ;)
+│               │   │   │   │   │       └── s_array_declaration
+│               │   │   │   │   │           └── epsilon
+│               │   │   │   │   └── var_declaration
+│               │   │   │   │       ├── type_specifier
+│               │   │   │   │       │   └── (KEYWORD, int)
+│               │   │   │   │       ├── (ID, arrsize)
+│               │   │   │   │       ├── (SYMBOL, ;)
+│               │   │   │   │       └── s_atomic_var_declaration
+│               │   │   │   │           └── epsilon
+│               │   │   │   └── var_declaration
+│               │   │   │       ├── type_specifier
+│               │   │   │       │   └── (KEYWORD, int)
+│               │   │   │       ├── (ID, i)
+│               │   │   │       ├── (SYMBOL, ;)
+│               │   │   │       └── s_atomic_var_declaration
+│               │   │   │           └── epsilon
+│               │   │   └── var_declaration
+│               │   │       ├── type_specifier
+│               │   │       │   └── (KEYWORD, int)
+│               │   │       ├── (ID, j)
+│               │   │       ├── (SYMBOL, ;)
+│               │   │       └── s_atomic_var_declaration
+│               │   │           └── epsilon
 │               │   └── var_declaration
 │               │       ├── type_specifier
 │               │       │   └── (KEYWORD, int)
-│               │       ├── (ID, i)
+│               │       ├── (ID, k)
 │               │       ├── (SYMBOL, ;)
 │               │       └── s_atomic_var_declaration
 │               │           └── epsilon
 │               ├── statement_list
 │               │   ├── statement_list
 │               │   │   ├── statement_list
-│               │   │   │   └── epsilon
+│               │   │   │   ├── statement_list
+│               │   │   │   │   └── epsilon
+│               │   │   │   └── statement
+│               │   │   │       └── expression_stmt
+│               │   │   │           ├── expression
+│               │   │   │           │   ├── var
+│               │   │   │           │   │   ├── s_PID
+│               │   │   │           │   │   │   └── epsilon
+│               │   │   │           │   │   └── (ID, arrsize)
+│               │   │   │           │   ├── (SYMBOL, =)
+│               │   │   │           │   ├── expression
+│               │   │   │           │   │   └── simple_expression
+│               │   │   │           │   │       └── additive_expression
+│               │   │   │           │   │           └── term
+│               │   │   │           │   │               └── factor
+│               │   │   │           │   │                   ├── s_push_num
+│               │   │   │           │   │                   │   └── epsilon
+│               │   │   │           │   │                   └── (NUM, 20)
+│               │   │   │           │   └── s_Assign
+│               │   │   │           │       └── epsilon
+│               │   │   │           ├── (SYMBOL, ;)
+│               │   │   │           └── s_pop_stack
+│               │   │   │               └── epsilon
 │               │   │   └── statement
 │               │   │       └── expression_stmt
 │               │   │           ├── expression
@@ -61,20 +118,29 @@ program
 │               │           ├── expression
 │               │           │   └── simple_expression
 │               │           │       ├── additive_expression
+│               │           │       │   ├── additive_expression
+│               │           │       │   │   └── term
+│               │           │       │   │       └── factor
+│               │           │       │   │           └── var
+│               │           │       │   │               ├── s_PID
+│               │           │       │   │               │   └── epsilon
+│               │           │       │   │               └── (ID, i)
+│               │           │       │   ├── addop
+│               │           │       │   │   └── (SYMBOL, +)
 │               │           │       │   └── term
 │               │           │       │       └── factor
-│               │           │       │           └── var
-│               │           │       │               ├── s_PID
-│               │           │       │               │   └── epsilon
-│               │           │       │               └── (ID, i)
+│               │           │       │           ├── s_push_num
+│               │           │       │           │   └── epsilon
+│               │           │       │           └── (NUM, 1)
 │               │           │       ├── relop
 │               │           │       │   └── (SYMBOL, <)
 │               │           │       └── additive_expression
 │               │           │           └── term
 │               │           │               └── factor
-│               │           │                   ├── s_push_num
-│               │           │                   │   └── epsilon
-│               │           │                   └── (NUM, 5)
+│               │           │                   └── var
+│               │           │                       ├── s_PID
+│               │           │                       │   └── epsilon
+│               │           │                       └── (ID, arrsize)
 │               │           ├── (SYMBOL, ))
 │               │           ├── s_save
 │               │           │   └── epsilon
@@ -87,7 +153,64 @@ program
 │               │                   │   ├── statement_list
 │               │                   │   │   ├── statement_list
 │               │                   │   │   │   ├── statement_list
-│               │                   │   │   │   │   └── epsilon
+│               │                   │   │   │   │   ├── statement_list
+│               │                   │   │   │   │   │   ├── statement_list
+│               │                   │   │   │   │   │   │   └── epsilon
+│               │                   │   │   │   │   │   └── statement
+│               │                   │   │   │   │   │       └── expression_stmt
+│               │                   │   │   │   │   │           ├── expression
+│               │                   │   │   │   │   │           │   ├── var
+│               │                   │   │   │   │   │           │   │   ├── s_PID
+│               │                   │   │   │   │   │           │   │   │   └── epsilon
+│               │                   │   │   │   │   │           │   │   └── (ID, j)
+│               │                   │   │   │   │   │           │   ├── (SYMBOL, =)
+│               │                   │   │   │   │   │           │   ├── expression
+│               │                   │   │   │   │   │           │   │   └── simple_expression
+│               │                   │   │   │   │   │           │   │       └── additive_expression
+│               │                   │   │   │   │   │           │   │           └── term
+│               │                   │   │   │   │   │           │   │               └── factor
+│               │                   │   │   │   │   │           │   │                   ├── s_push_num
+│               │                   │   │   │   │   │           │   │                   │   └── epsilon
+│               │                   │   │   │   │   │           │   │                   └── (NUM, 0)
+│               │                   │   │   │   │   │           │   └── s_Assign
+│               │                   │   │   │   │   │           │       └── epsilon
+│               │                   │   │   │   │   │           ├── (SYMBOL, ;)
+│               │                   │   │   │   │   │           └── s_pop_stack
+│               │                   │   │   │   │   │               └── epsilon
+│               │                   │   │   │   │   └── statement
+│               │                   │   │   │   │       └── expression_stmt
+│               │                   │   │   │   │           ├── expression
+│               │                   │   │   │   │           │   ├── var
+│               │                   │   │   │   │           │   │   ├── s_PID
+│               │                   │   │   │   │           │   │   │   └── epsilon
+│               │                   │   │   │   │           │   │   ├── (ID, arr)
+│               │                   │   │   │   │           │   │   ├── (SYMBOL, [)
+│               │                   │   │   │   │           │   │   ├── expression
+│               │                   │   │   │   │           │   │   │   └── simple_expression
+│               │                   │   │   │   │           │   │   │       └── additive_expression
+│               │                   │   │   │   │           │   │   │           └── term
+│               │                   │   │   │   │           │   │   │               └── factor
+│               │                   │   │   │   │           │   │   │                   └── var
+│               │                   │   │   │   │           │   │   │                       ├── s_PID
+│               │                   │   │   │   │           │   │   │                       │   └── epsilon
+│               │                   │   │   │   │           │   │   │                       └── (ID, i)
+│               │                   │   │   │   │           │   │   ├── (SYMBOL, ])
+│               │                   │   │   │   │           │   │   └── s_array_select
+│               │                   │   │   │   │           │   │       └── epsilon
+│               │                   │   │   │   │           │   ├── (SYMBOL, =)
+│               │                   │   │   │   │           │   ├── expression
+│               │                   │   │   │   │           │   │   └── simple_expression
+│               │                   │   │   │   │           │   │       └── additive_expression
+│               │                   │   │   │   │           │   │           └── term
+│               │                   │   │   │   │           │   │               └── factor
+│               │                   │   │   │   │           │   │                   ├── s_push_num
+│               │                   │   │   │   │           │   │                   │   └── epsilon
+│               │                   │   │   │   │           │   │                   └── (NUM, 2)
+│               │                   │   │   │   │           │   └── s_Assign
+│               │                   │   │   │   │           │       └── epsilon
+│               │                   │   │   │   │           ├── (SYMBOL, ;)
+│               │                   │   │   │   │           └── s_pop_stack
+│               │                   │   │   │   │               └── epsilon
 │               │                   │   │   │   └── statement
 │               │                   │   │   │       └── expression_stmt
 │               │                   │   │   │           ├── expression
@@ -116,79 +239,176 @@ program
 │               │                   │   │   │           └── s_pop_stack
 │               │                   │   │   │               └── epsilon
 │               │                   │   │   └── statement
-│               │                   │   │       └── expression_stmt
+│               │                   │   │       └── iteration_stmt
+│               │                   │   │           ├── s_switch_save
+│               │                   │   │           │   └── epsilon
+│               │                   │   │           ├── (KEYWORD, while)
+│               │                   │   │           ├── s_jmp_to_expr
+│               │                   │   │           │   └── epsilon
+│               │                   │   │           ├── (SYMBOL, ()
+│               │                   │   │           ├── s_label
+│               │                   │   │           │   └── epsilon
 │               │                   │   │           ├── expression
-│               │                   │   │           │   ├── var
-│               │                   │   │           │   │   ├── s_PID
-│               │                   │   │           │   │   │   └── epsilon
-│               │                   │   │           │   │   └── (ID, i)
-│               │                   │   │           │   ├── (SYMBOL, =)
-│               │                   │   │           │   ├── expression
-│               │                   │   │           │   │   └── simple_expression
-│               │                   │   │           │   │       └── additive_expression
-│               │                   │   │           │   │           ├── additive_expression
-│               │                   │   │           │   │           │   └── term
-│               │                   │   │           │   │           │       └── factor
-│               │                   │   │           │   │           │           └── var
-│               │                   │   │           │   │           │               ├── s_PID
-│               │                   │   │           │   │           │               │   └── epsilon
-│               │                   │   │           │   │           │               └── (ID, i)
-│               │                   │   │           │   │           ├── addop
-│               │                   │   │           │   │           │   └── (SYMBOL, +)
-│               │                   │   │           │   │           └── term
-│               │                   │   │           │   │               └── factor
-│               │                   │   │           │   │                   ├── s_push_num
-│               │                   │   │           │   │                   │   └── epsilon
-│               │                   │   │           │   │                   └── (NUM, 1)
-│               │                   │   │           │   └── s_Assign
-│               │                   │   │           │       └── epsilon
-│               │                   │   │           ├── (SYMBOL, ;)
-│               │                   │   │           └── s_pop_stack
-│               │                   │   │               └── epsilon
+│               │                   │   │           │   └── simple_expression
+│               │                   │   │           │       ├── additive_expression
+│               │                   │   │           │       │   └── term
+│               │                   │   │           │       │       └── factor
+│               │                   │   │           │       │           └── var
+│               │                   │   │           │       │               ├── s_PID
+│               │                   │   │           │       │               │   └── epsilon
+│               │                   │   │           │       │               └── (ID, j)
+│               │                   │   │           │       ├── relop
+│               │                   │   │           │       │   └── (SYMBOL, <)
+│               │                   │   │           │       └── additive_expression
+│               │                   │   │           │           └── term
+│               │                   │   │           │               └── factor
+│               │                   │   │           │                   └── var
+│               │                   │   │           │                       ├── s_PID
+│               │                   │   │           │                       │   └── epsilon
+│               │                   │   │           │                       └── (ID, i)
+│               │                   │   │           ├── (SYMBOL, ))
+│               │                   │   │           ├── s_save
+│               │                   │   │           │   └── epsilon
+│               │                   │   │           └── statement
+│               │                   │   │               └── compound_stmt
+│               │                   │   │                   ├── (SYMBOL, {)
+│               │                   │   │                   ├── local_declarations
+│               │                   │   │                   │   └── epsilon
+│               │                   │   │                   ├── statement_list
+│               │                   │   │                   │   ├── statement_list
+│               │                   │   │                   │   │   ├── statement_list
+│               │                   │   │                   │   │   │   └── epsilon
+│               │                   │   │                   │   │   └── statement
+│               │                   │   │                   │   │       └── expression_stmt
+│               │                   │   │                   │   │           ├── expression
+│               │                   │   │                   │   │           │   ├── var
+│               │                   │   │                   │   │           │   │   ├── s_PID
+│               │                   │   │                   │   │           │   │   │   └── epsilon
+│               │                   │   │                   │   │           │   │   ├── (ID, arr)
+│               │                   │   │                   │   │           │   │   ├── (SYMBOL, [)
+│               │                   │   │                   │   │           │   │   ├── expression
+│               │                   │   │                   │   │           │   │   │   └── simple_expression
+│               │                   │   │                   │   │           │   │   │       └── additive_expression
+│               │                   │   │                   │   │           │   │   │           └── term
+│               │                   │   │                   │   │           │   │   │               └── factor
+│               │                   │   │                   │   │           │   │   │                   └── var
+│               │                   │   │                   │   │           │   │   │                       ├── s_PID
+│               │                   │   │                   │   │           │   │   │                       │   └── epsilon
+│               │                   │   │                   │   │           │   │   │                       └── (ID, i)
+│               │                   │   │                   │   │           │   │   ├── (SYMBOL, ])
+│               │                   │   │                   │   │           │   │   └── s_array_select
+│               │                   │   │                   │   │           │   │       └── epsilon
+│               │                   │   │                   │   │           │   ├── (SYMBOL, =)
+│               │                   │   │                   │   │           │   ├── expression
+│               │                   │   │                   │   │           │   │   └── simple_expression
+│               │                   │   │                   │   │           │   │       └── additive_expression
+│               │                   │   │                   │   │           │   │           └── term
+│               │                   │   │                   │   │           │   │               ├── term
+│               │                   │   │                   │   │           │   │               │   └── factor
+│               │                   │   │                   │   │           │   │               │       └── var
+│               │                   │   │                   │   │           │   │               │           ├── s_PID
+│               │                   │   │                   │   │           │   │               │           │   └── epsilon
+│               │                   │   │                   │   │           │   │               │           ├── (ID, arr)
+│               │                   │   │                   │   │           │   │               │           ├── (SYMBOL, [)
+│               │                   │   │                   │   │           │   │               │           ├── expression
+│               │                   │   │                   │   │           │   │               │           │   └── simple_expression
+│               │                   │   │                   │   │           │   │               │           │       └── additive_expression
+│               │                   │   │                   │   │           │   │               │           │           └── term
+│               │                   │   │                   │   │           │   │               │           │               └── factor
+│               │                   │   │                   │   │           │   │               │           │                   └── var
+│               │                   │   │                   │   │           │   │               │           │                       ├── s_PID
+│               │                   │   │                   │   │           │   │               │           │                       │   └── epsilon
+│               │                   │   │                   │   │           │   │               │           │                       └── (ID, i)
+│               │                   │   │                   │   │           │   │               │           ├── (SYMBOL, ])
+│               │                   │   │                   │   │           │   │               │           └── s_array_select
+│               │                   │   │                   │   │           │   │               │               └── epsilon
+│               │                   │   │                   │   │           │   │               ├── mulop
+│               │                   │   │                   │   │           │   │               │   └── (SYMBOL, *)
+│               │                   │   │                   │   │           │   │               └── factor
+│               │                   │   │                   │   │           │   │                   ├── (SYMBOL, ()
+│               │                   │   │                   │   │           │   │                   ├── expression
+│               │                   │   │                   │   │           │   │                   │   └── simple_expression
+│               │                   │   │                   │   │           │   │                   │       └── additive_expression
+│               │                   │   │                   │   │           │   │                   │           ├── additive_expression
+│               │                   │   │                   │   │           │   │                   │           │   └── term
+│               │                   │   │                   │   │           │   │                   │           │       └── factor
+│               │                   │   │                   │   │           │   │                   │           │           ├── s_push_num
+│               │                   │   │                   │   │           │   │                   │           │           │   └── epsilon
+│               │                   │   │                   │   │           │   │                   │           │           └── (NUM, 0)
+│               │                   │   │                   │   │           │   │                   │           ├── addop
+│               │                   │   │                   │   │           │   │                   │           │   └── (SYMBOL, -)
+│               │                   │   │                   │   │           │   │                   │           └── term
+│               │                   │   │                   │   │           │   │                   │               └── factor
+│               │                   │   │                   │   │           │   │                   │                   ├── s_push_num
+│               │                   │   │                   │   │           │   │                   │                   │   └── epsilon
+│               │                   │   │                   │   │           │   │                   │                   └── (NUM, 2)
+│               │                   │   │                   │   │           │   │                   └── (SYMBOL, ))
+│               │                   │   │                   │   │           │   └── s_Assign
+│               │                   │   │                   │   │           │       └── epsilon
+│               │                   │   │                   │   │           ├── (SYMBOL, ;)
+│               │                   │   │                   │   │           └── s_pop_stack
+│               │                   │   │                   │   │               └── epsilon
+│               │                   │   │                   │   └── statement
+│               │                   │   │                   │       └── expression_stmt
+│               │                   │   │                   │           ├── expression
+│               │                   │   │                   │           │   ├── var
+│               │                   │   │                   │           │   │   ├── s_PID
+│               │                   │   │                   │           │   │   │   └── epsilon
+│               │                   │   │                   │           │   │   └── (ID, j)
+│               │                   │   │                   │           │   ├── (SYMBOL, =)
+│               │                   │   │                   │           │   ├── expression
+│               │                   │   │                   │           │   │   └── simple_expression
+│               │                   │   │                   │           │   │       └── additive_expression
+│               │                   │   │                   │           │   │           ├── additive_expression
+│               │                   │   │                   │           │   │           │   └── term
+│               │                   │   │                   │           │   │           │       └── factor
+│               │                   │   │                   │           │   │           │           └── var
+│               │                   │   │                   │           │   │           │               ├── s_PID
+│               │                   │   │                   │           │   │           │               │   └── epsilon
+│               │                   │   │                   │           │   │           │               └── (ID, j)
+│               │                   │   │                   │           │   │           ├── addop
+│               │                   │   │                   │           │   │           │   └── (SYMBOL, +)
+│               │                   │   │                   │           │   │           └── term
+│               │                   │   │                   │           │   │               └── factor
+│               │                   │   │                   │           │   │                   ├── s_push_num
+│               │                   │   │                   │           │   │                   │   └── epsilon
+│               │                   │   │                   │           │   │                   └── (NUM, 1)
+│               │                   │   │                   │           │   └── s_Assign
+│               │                   │   │                   │           │       └── epsilon
+│               │                   │   │                   │           ├── (SYMBOL, ;)
+│               │                   │   │                   │           └── s_pop_stack
+│               │                   │   │                   │               └── epsilon
+│               │                   │   │                   └── (SYMBOL, })
 │               │                   │   └── statement
-│               │                   │       └── selection_stmt
-│               │                   │           ├── (KEYWORD, if)
-│               │                   │           ├── (SYMBOL, ()
+│               │                   │       └── expression_stmt
 │               │                   │           ├── expression
-│               │                   │           │   └── simple_expression
-│               │                   │           │       ├── additive_expression
-│               │                   │           │       │   └── term
-│               │                   │           │       │       └── factor
-│               │                   │           │       │           └── var
-│               │                   │           │       │               ├── s_PID
-│               │                   │           │       │               │   └── epsilon
-│               │                   │           │       │               └── (ID, i)
-│               │                   │           │       ├── relop
-│               │                   │           │       │   └── (SYMBOL, ==)
-│               │                   │           │       └── additive_expression
-│               │                   │           │           └── term
-│               │                   │           │               └── factor
-│               │                   │           │                   ├── s_push_num
-│               │                   │           │                   │   └── epsilon
-│               │                   │           │                   └── (NUM, 3)
-│               │                   │           ├── (SYMBOL, ))
-│               │                   │           ├── s_save
-│               │                   │           │   └── epsilon
-│               │                   │           ├── statement
-│               │                   │           │   └── compound_stmt
-│               │                   │           │       ├── (SYMBOL, {)
-│               │                   │           │       ├── local_declarations
-│               │                   │           │       │   └── epsilon
-│               │                   │           │       ├── statement_list
-│               │                   │           │       │   ├── statement_list
-│               │                   │           │       │   │   └── epsilon
-│               │                   │           │       │   └── statement
-│               │                   │           │       │       └── expression_stmt
-│               │                   │           │       │           ├── s_check_break
-│               │                   │           │       │           │   └── epsilon
-│               │                   │           │       │           ├── (KEYWORD, break)
-│               │                   │           │       │           ├── s_break_out
-│               │                   │           │       │           │   └── epsilon
-│               │                   │           │       │           └── (SYMBOL, ;)
-│               │                   │           │       └── (SYMBOL, })
-│               │                   │           ├── s_jpf
-│               │                   │           │   └── epsilon
-│               │                   │           └── (KEYWORD, endif)
+│               │                   │           │   ├── var
+│               │                   │           │   │   ├── s_PID
+│               │                   │           │   │   │   └── epsilon
+│               │                   │           │   │   └── (ID, i)
+│               │                   │           │   ├── (SYMBOL, =)
+│               │                   │           │   ├── expression
+│               │                   │           │   │   └── simple_expression
+│               │                   │           │   │       └── additive_expression
+│               │                   │           │   │           ├── additive_expression
+│               │                   │           │   │           │   └── term
+│               │                   │           │   │           │       └── factor
+│               │                   │           │   │           │           └── var
+│               │                   │           │   │           │               ├── s_PID
+│               │                   │           │   │           │               │   └── epsilon
+│               │                   │           │   │           │               └── (ID, i)
+│               │                   │           │   │           ├── addop
+│               │                   │           │   │           │   └── (SYMBOL, +)
+│               │                   │           │   │           └── term
+│               │                   │           │   │               └── factor
+│               │                   │           │   │                   ├── s_push_num
+│               │                   │           │   │                   │   └── epsilon
+│               │                   │           │   │                   └── (NUM, 1)
+│               │                   │           │   └── s_Assign
+│               │                   │           │       └── epsilon
+│               │                   │           ├── (SYMBOL, ;)
+│               │                   │           └── s_pop_stack
+│               │                   │               └── epsilon
 │               │                   └── (SYMBOL, })
 │               └── (SYMBOL, })
 └── $

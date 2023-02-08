@@ -10,5 +10,9 @@
 10.	return
 11.	endif
 12.	main
-13.	i
-14.	output
+13.	arr
+14.	arrsize
+15.	i
+16.	j
+17.	k
+18.	output
