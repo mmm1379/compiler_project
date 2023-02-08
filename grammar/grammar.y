@@ -44,13 +44,13 @@ statement: expression_stmt
 | switch_stmt
 ;
 expression_stmt: expression ';' s_pop_stack
-| s_check_break "break" ';'
+| s_check_break "break" s_break_out ';'
 | ';'
 ;
 selection_stmt: "if" '(' expression ')' s_save statement s_jpf "endif"
 | "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
 ;
-iteration_stmt: s_push_scope_stack "while" s_label '(' expression ')' s_save statement
+iteration_stmt: s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
 ;
 return_stmt: "return" ';'
 | "return" expression ';'
@@ -137,9 +137,9 @@ s_switch_save : /* epsilon */
 ;
 s_array_select : /* epsilon */
 ;
-s_push_scope_stack : /* epsilon */
-;
 s_check_break : /* epsilon */
+;
+s_break_out : /* epsilon */
 ;
 
 %%

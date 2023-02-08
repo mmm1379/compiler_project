@@ -5,6 +5,20 @@ void main(void){
     int b;
     int c;
     a = 5;
+    switch(a){
+        case 5:
+            a = 2;
+            break;
+        case 7:
+            a = 2;
+            break;
+        case 8:
+            a = 2;
+            break;
+        default:
+            a = 2;
+            break;
+    }
     b = 3;
     c = a + b;
     if(c < 5){

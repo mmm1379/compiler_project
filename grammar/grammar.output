@@ -43,13 +43,13 @@ Grammar
    27          | switch_stmt
 
    28 expression_stmt: expression ';' s_pop_stack
-   29                | s_check_break "break" ';'
+   29                | s_check_break "break" s_break_out ';'
    30                | ';'
 
    31 selection_stmt: "if" '(' expression ')' s_save statement s_jpf "endif"
    32               | "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
 
-   33 iteration_stmt: s_push_scope_stack "while" s_label '(' expression ')' s_save statement
+   33 iteration_stmt: s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
 
    34 return_stmt: "return" ';'
    35            | "return" expression ';'
@@ -135,9 +135,9 @@ Grammar
 
    83 s_array_select: ε
 
-   84 s_push_scope_stack: ε
+   84 s_check_break: ε
 
-   85 s_check_break: ε
+   85 s_break_out: ε
 
 
 Terminals, with rules where they appear
@@ -301,7 +301,7 @@ Nonterminals, with rules where they appear
         on right: 31 32 33
     s_jmp_to_expr (73)
         on left: 74
-        on right: 36
+        on right: 33 36
     s_switch_jf (74)
         on left: 75
         on right: 39
@@ -325,14 +325,14 @@ Nonterminals, with rules where they appear
         on right: 28
     s_switch_save (81)
         on left: 82
-        on right: 36
+        on right: 33 36
     s_array_select (82)
         on left: 83
         on right: 45
-    s_push_scope_stack (83)
+    s_check_break (83)
         on left: 84
-        on right: 33
-    s_check_break (84)
+        on right: 29
+    s_break_out (84)
         on left: 85
         on right: 29
 
@@ -730,11 +730,11 @@ State 39
    26          | • return_stmt
    27          | • switch_stmt
    28 expression_stmt: • expression ';' s_pop_stack
-   29                | • s_check_break "break" ';'
+   29                | • s_check_break "break" s_break_out ';'
    30                | • ';'
    31 selection_stmt: • "if" '(' expression ')' s_save statement s_jpf "endif"
    32               | • "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
-   33 iteration_stmt: • s_push_scope_stack "while" s_label '(' expression ')' s_save statement
+   33 iteration_stmt: • s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
    34 return_stmt: • "return" ';'
    35            | • "return" expression ';'
    36 switch_stmt: • s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
@@ -755,9 +755,8 @@ State 39
    62 call: • s_PID ID '(' args ')'
    67 s_PID: ε •  [ID]
    80 s_push_num: ε •  [NUM]
-   82 s_switch_save: ε •  ["switch"]
-   84 s_push_scope_stack: ε •  ["while"]
-   85 s_check_break: ε •  ["break"]
+   82 s_switch_save: ε •  ["while", "switch"]
+   84 s_check_break: ε •  ["break"]
 
     ';'       shift, and go to state 41
     '('       shift, and go to state 42
@@ -767,10 +766,9 @@ State 39
     "return"  shift, and go to state 45
 
     NUM       reduce using rule 80 (s_push_num)
-    "break"   reduce using rule 85 (s_check_break)
-    "while"   reduce using rule 84 (s_push_scope_stack)
-    "switch"  reduce using rule 82 (s_switch_save)
-    $default  reduce using rule 67 (s_PID)
+    ID        reduce using rule 67 (s_PID)
+    "break"   reduce using rule 84 (s_check_break)
+    $default  reduce using rule 82 (s_switch_save)
 
     compound_stmt        go to state 46
     statement            go to state 47
@@ -789,8 +787,7 @@ State 39
     s_PID                go to state 60
     s_push_num           go to state 61
     s_switch_save        go to state 62
-    s_push_scope_stack   go to state 63
-    s_check_break        go to state 64
+    s_check_break        go to state 63
 
 
 State 40
@@ -835,7 +832,7 @@ State 42
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    expression           go to state 65
+    expression           go to state 64
     var                  go to state 54
     simple_expression    go to state 55
     additive_expression  go to state 56
@@ -858,7 +855,7 @@ State 44
    31 selection_stmt: "if" • '(' expression ')' s_save statement s_jpf "endif"
    32               | "if" • '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
 
-    '('  shift, and go to state 66
+    '('  shift, and go to state 65
 
 
 State 45
@@ -883,13 +880,13 @@ State 45
    67 s_PID: ε •  [ID]
    80 s_push_num: ε •  [NUM]
 
-    ';'  shift, and go to state 67
+    ';'  shift, and go to state 66
     '('  shift, and go to state 42
 
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    expression           go to state 68
+    expression           go to state 67
     var                  go to state 54
     simple_expression    go to state 55
     additive_expression  go to state 56
@@ -953,7 +950,7 @@ State 53
 
    28 expression_stmt: expression • ';' s_pop_stack
 
-    ';'  shift, and go to state 69
+    ';'  shift, and go to state 68
 
 
 State 54
@@ -961,7 +958,7 @@ State 54
    42 expression: var • '=' expression s_Assign
    59 factor: var •  [';', ']', ')', ',', '<', "==", '+', '-', '*', '/']
 
-    '='  shift, and go to state 70
+    '='  shift, and go to state 69
 
     $default  reduce using rule 59 (factor)
 
@@ -983,15 +980,15 @@ State 56
    52 addop: • '+'
    53      | • '-'
 
-    '<'   shift, and go to state 71
-    "=="  shift, and go to state 72
-    '+'   shift, and go to state 73
-    '-'   shift, and go to state 74
+    '<'   shift, and go to state 70
+    "=="  shift, and go to state 71
+    '+'   shift, and go to state 72
+    '-'   shift, and go to state 73
 
     $default  reduce using rule 47 (simple_expression)
 
-    relop  go to state 75
-    addop  go to state 76
+    relop  go to state 74
+    addop  go to state 75
 
 
 State 57
@@ -1001,12 +998,12 @@ State 57
    56 mulop: • '*'
    57      | • '/'
 
-    '*'  shift, and go to state 77
-    '/'  shift, and go to state 78
+    '*'  shift, and go to state 76
+    '/'  shift, and go to state 77
 
     $default  reduce using rule 51 (additive_expression)
 
-    mulop  go to state 79
+    mulop  go to state 78
 
 
 State 58
@@ -1029,45 +1026,40 @@ State 60
    45    | s_PID • ID '[' expression ']' s_array_select
    62 call: s_PID • ID '(' args ')'
 
-    ID  shift, and go to state 80
+    ID  shift, and go to state 79
 
 
 State 61
 
    61 factor: s_push_num • NUM
 
-    NUM  shift, and go to state 81
+    NUM  shift, and go to state 80
 
 
 State 62
 
+   33 iteration_stmt: s_switch_save • "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
    36 switch_stmt: s_switch_save • "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
 
+    "while"   shift, and go to state 81
     "switch"  shift, and go to state 82
 
 
 State 63
 
-   33 iteration_stmt: s_push_scope_stack • "while" s_label '(' expression ')' s_save statement
+   29 expression_stmt: s_check_break • "break" s_break_out ';'
 
-    "while"  shift, and go to state 83
+    "break"  shift, and go to state 83
 
 
 State 64
 
-   29 expression_stmt: s_check_break • "break" ';'
+   58 factor: '(' expression • ')'
 
-    "break"  shift, and go to state 84
+    ')'  shift, and go to state 84
 
 
 State 65
-
-   58 factor: '(' expression • ')'
-
-    ')'  shift, and go to state 85
-
-
-State 66
 
    31 selection_stmt: "if" '(' • expression ')' s_save statement s_jpf "endif"
    32               | "if" '(' • expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
@@ -1094,7 +1086,7 @@ State 66
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    expression           go to state 86
+    expression           go to state 85
     var                  go to state 54
     simple_expression    go to state 55
     additive_expression  go to state 56
@@ -1105,31 +1097,31 @@ State 66
     s_push_num           go to state 61
 
 
-State 67
+State 66
 
    34 return_stmt: "return" ';' •
 
     $default  reduce using rule 34 (return_stmt)
 
 
-State 68
+State 67
 
    35 return_stmt: "return" expression • ';'
 
-    ';'  shift, and go to state 87
+    ';'  shift, and go to state 86
 
 
-State 69
+State 68
 
    28 expression_stmt: expression ';' • s_pop_stack
    81 s_pop_stack: ε •
 
     $default  reduce using rule 81 (s_pop_stack)
 
-    s_pop_stack  go to state 88
+    s_pop_stack  go to state 87
 
 
-State 70
+State 69
 
    42 expression: • var '=' expression s_Assign
    42           | var '=' • expression s_Assign
@@ -1155,7 +1147,7 @@ State 70
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    expression           go to state 89
+    expression           go to state 88
     var                  go to state 54
     simple_expression    go to state 55
     additive_expression  go to state 56
@@ -1166,35 +1158,35 @@ State 70
     s_push_num           go to state 61
 
 
-State 71
+State 70
 
    48 relop: '<' •
 
     $default  reduce using rule 48 (relop)
 
 
-State 72
+State 71
 
    49 relop: "==" •
 
     $default  reduce using rule 49 (relop)
 
 
-State 73
+State 72
 
    52 addop: '+' •
 
     $default  reduce using rule 52 (addop)
 
 
-State 74
+State 73
 
    53 addop: '-' •
 
     $default  reduce using rule 53 (addop)
 
 
-State 75
+State 74
 
    44 var: • s_PID ID
    45    | • s_PID ID '[' expression ']' s_array_select
@@ -1216,8 +1208,8 @@ State 75
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    var                  go to state 90
-    additive_expression  go to state 91
+    var                  go to state 89
+    additive_expression  go to state 90
     term                 go to state 57
     factor               go to state 58
     call                 go to state 59
@@ -1225,7 +1217,7 @@ State 75
     s_push_num           go to state 61
 
 
-State 76
+State 75
 
    44 var: • s_PID ID
    45    | • s_PID ID '[' expression ']' s_array_select
@@ -1245,29 +1237,29 @@ State 76
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    var         go to state 90
-    term        go to state 92
+    var         go to state 89
+    term        go to state 91
     factor      go to state 58
     call        go to state 59
     s_PID       go to state 60
     s_push_num  go to state 61
 
 
-State 77
+State 76
 
    56 mulop: '*' •
 
     $default  reduce using rule 56 (mulop)
 
 
-State 78
+State 77
 
    57 mulop: '/' •
 
     $default  reduce using rule 57 (mulop)
 
 
-State 79
+State 78
 
    44 var: • s_PID ID
    45    | • s_PID ID '[' expression ']' s_array_select
@@ -1285,30 +1277,40 @@ State 79
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    var         go to state 90
-    factor      go to state 93
+    var         go to state 89
+    factor      go to state 92
     call        go to state 59
     s_PID       go to state 60
     s_push_num  go to state 61
 
 
-State 80
+State 79
 
    44 var: s_PID ID •  [';', ']', ')', ',', '=', '<', "==", '+', '-', '*', '/']
    45    | s_PID ID • '[' expression ']' s_array_select
    62 call: s_PID ID • '(' args ')'
 
-    '['  shift, and go to state 94
-    '('  shift, and go to state 95
+    '['  shift, and go to state 93
+    '('  shift, and go to state 94
 
     $default  reduce using rule 44 (var)
 
 
-State 81
+State 80
 
    61 factor: s_push_num NUM •
 
     $default  reduce using rule 61 (factor)
+
+
+State 81
+
+   33 iteration_stmt: s_switch_save "while" • s_jmp_to_expr '(' s_label expression ')' s_save statement
+   74 s_jmp_to_expr: ε •
+
+    $default  reduce using rule 74 (s_jmp_to_expr)
+
+    s_jmp_to_expr  go to state 95
 
 
 State 82
@@ -1320,105 +1322,98 @@ State 82
 
 State 83
 
-   33 iteration_stmt: s_push_scope_stack "while" • s_label '(' expression ')' s_save statement
-   72 s_label: ε •
+   29 expression_stmt: s_check_break "break" • s_break_out ';'
+   85 s_break_out: ε •
 
-    $default  reduce using rule 72 (s_label)
+    $default  reduce using rule 85 (s_break_out)
 
-    s_label  go to state 97
+    s_break_out  go to state 97
 
 
 State 84
-
-   29 expression_stmt: s_check_break "break" • ';'
-
-    ';'  shift, and go to state 98
-
-
-State 85
 
    58 factor: '(' expression ')' •
 
     $default  reduce using rule 58 (factor)
 
 
-State 86
+State 85
 
    31 selection_stmt: "if" '(' expression • ')' s_save statement s_jpf "endif"
    32               | "if" '(' expression • ')' s_save statement "else" s_jpf_save statement s_jp "endif"
 
-    ')'  shift, and go to state 99
+    ')'  shift, and go to state 98
 
 
-State 87
+State 86
 
    35 return_stmt: "return" expression ';' •
 
     $default  reduce using rule 35 (return_stmt)
 
 
-State 88
+State 87
 
    28 expression_stmt: expression ';' s_pop_stack •
 
     $default  reduce using rule 28 (expression_stmt)
 
 
-State 89
+State 88
 
    42 expression: var '=' expression • s_Assign
    68 s_Assign: ε •
 
     $default  reduce using rule 68 (s_Assign)
 
-    s_Assign  go to state 100
+    s_Assign  go to state 99
 
 
-State 90
+State 89
 
    59 factor: var •
 
     $default  reduce using rule 59 (factor)
 
 
-State 91
+State 90
 
    46 simple_expression: additive_expression relop additive_expression •  [';', ']', ')', ',']
    50 additive_expression: additive_expression • addop term
    52 addop: • '+'
    53      | • '-'
 
-    '+'  shift, and go to state 73
-    '-'  shift, and go to state 74
+    '+'  shift, and go to state 72
+    '-'  shift, and go to state 73
 
     $default  reduce using rule 46 (simple_expression)
 
-    addop  go to state 76
+    addop  go to state 75
 
 
-State 92
+State 91
 
    50 additive_expression: additive_expression addop term •  [';', ']', ')', ',', '<', "==", '+', '-']
    54 term: term • mulop factor
    56 mulop: • '*'
    57      | • '/'
 
-    '*'  shift, and go to state 77
-    '/'  shift, and go to state 78
+    '*'  shift, and go to state 76
+    '/'  shift, and go to state 77
 
     $default  reduce using rule 50 (additive_expression)
 
-    mulop  go to state 79
+    mulop  go to state 78
 
 
-State 93
+State 92
 
    54 term: term mulop factor •
 
     $default  reduce using rule 54 (term)
 
 
-State 94
+State 93
 
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
@@ -1444,7 +1439,7 @@ State 94
     NUM       reduce using rule 80 (s_push_num)
     $default  reduce using rule 67 (s_PID)
 
-    expression           go to state 101
+    expression           go to state 100
     var                  go to state 54
     simple_expression    go to state 55
     additive_expression  go to state 56
@@ -1455,7 +1450,7 @@ State 94
     s_push_num           go to state 61
 
 
-State 95
+State 94
 
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
@@ -1486,17 +1481,24 @@ State 95
     ID        reduce using rule 67 (s_PID)
     $default  reduce using rule 64 (args)
 
-    expression           go to state 102
+    expression           go to state 101
     var                  go to state 54
     simple_expression    go to state 55
     additive_expression  go to state 56
     term                 go to state 57
     factor               go to state 58
     call                 go to state 59
-    args                 go to state 103
-    arg_list             go to state 104
+    args                 go to state 102
+    arg_list             go to state 103
     s_PID                go to state 60
     s_push_num           go to state 61
+
+
+State 95
+
+   33 iteration_stmt: s_switch_save "while" s_jmp_to_expr • '(' s_label expression ')' s_save statement
+
+    '('  shift, and go to state 104
 
 
 State 96
@@ -1511,19 +1513,12 @@ State 96
 
 State 97
 
-   33 iteration_stmt: s_push_scope_stack "while" s_label • '(' expression ')' s_save statement
+   29 expression_stmt: s_check_break "break" s_break_out • ';'
 
-    '('  shift, and go to state 106
+    ';'  shift, and go to state 106
 
 
 State 98
-
-   29 expression_stmt: s_check_break "break" ';' •
-
-    $default  reduce using rule 29 (expression_stmt)
-
-
-State 99
 
    31 selection_stmt: "if" '(' expression ')' • s_save statement s_jpf "endif"
    32               | "if" '(' expression ')' • s_save statement "else" s_jpf_save statement s_jp "endif"
@@ -1534,35 +1529,35 @@ State 99
     s_save  go to state 107
 
 
-State 100
+State 99
 
    42 expression: var '=' expression s_Assign •
 
     $default  reduce using rule 42 (expression)
 
 
-State 101
+State 100
 
    45 var: s_PID ID '[' expression • ']' s_array_select
 
     ']'  shift, and go to state 108
 
 
-State 102
+State 101
 
    66 arg_list: expression •
 
     $default  reduce using rule 66 (arg_list)
 
 
-State 103
+State 102
 
    62 call: s_PID ID '(' args • ')'
 
     ')'  shift, and go to state 109
 
 
-State 104
+State 103
 
    63 args: arg_list •  [')']
    65 arg_list: arg_list • ',' expression
@@ -1572,46 +1567,19 @@ State 104
     $default  reduce using rule 63 (args)
 
 
+State 104
+
+   33 iteration_stmt: s_switch_save "while" s_jmp_to_expr '(' • s_label expression ')' s_save statement
+   72 s_label: ε •
+
+    $default  reduce using rule 72 (s_label)
+
+    s_label  go to state 111
+
+
 State 105
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr • expression ')' '{' case_stmts default_stmt '}'
-   42 expression: • var '=' expression s_Assign
-   43           | • simple_expression
-   44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']' s_array_select
-   46 simple_expression: • additive_expression relop additive_expression
-   47                  | • additive_expression
-   50 additive_expression: • additive_expression addop term
-   51                    | • term
-   54 term: • term mulop factor
-   55     | • factor
-   58 factor: • '(' expression ')'
-   59       | • var
-   60       | • call
-   61       | • s_push_num NUM
-   62 call: • s_PID ID '(' args ')'
-   67 s_PID: ε •  [ID]
-   80 s_push_num: ε •  [NUM]
-
-    '('  shift, and go to state 42
-
-    NUM       reduce using rule 80 (s_push_num)
-    $default  reduce using rule 67 (s_PID)
-
-    expression           go to state 111
-    var                  go to state 54
-    simple_expression    go to state 55
-    additive_expression  go to state 56
-    term                 go to state 57
-    factor               go to state 58
-    call                 go to state 59
-    s_PID                go to state 60
-    s_push_num           go to state 61
-
-
-State 106
-
-   33 iteration_stmt: s_push_scope_stack "while" s_label '(' • expression ')' s_save statement
    42 expression: • var '=' expression s_Assign
    43           | • simple_expression
    44 var: • s_PID ID
@@ -1646,6 +1614,13 @@ State 106
     s_push_num           go to state 61
 
 
+State 106
+
+   29 expression_stmt: s_check_break "break" s_break_out ';' •
+
+    $default  reduce using rule 29 (expression_stmt)
+
+
 State 107
 
    17 compound_stmt: • '{' local_declarations statement_list '}'
@@ -1656,13 +1631,13 @@ State 107
    26          | • return_stmt
    27          | • switch_stmt
    28 expression_stmt: • expression ';' s_pop_stack
-   29                | • s_check_break "break" ';'
+   29                | • s_check_break "break" s_break_out ';'
    30                | • ';'
    31 selection_stmt: • "if" '(' expression ')' s_save statement s_jpf "endif"
    31               | "if" '(' expression ')' s_save • statement s_jpf "endif"
    32               | • "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
    32               | "if" '(' expression ')' s_save • statement "else" s_jpf_save statement s_jp "endif"
-   33 iteration_stmt: • s_push_scope_stack "while" s_label '(' expression ')' s_save statement
+   33 iteration_stmt: • s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
    34 return_stmt: • "return" ';'
    35            | • "return" expression ';'
    36 switch_stmt: • s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
@@ -1683,9 +1658,8 @@ State 107
    62 call: • s_PID ID '(' args ')'
    67 s_PID: ε •  [ID]
    80 s_push_num: ε •  [NUM]
-   82 s_switch_save: ε •  ["switch"]
-   84 s_push_scope_stack: ε •  ["while"]
-   85 s_check_break: ε •  ["break"]
+   82 s_switch_save: ε •  ["while", "switch"]
+   84 s_check_break: ε •  ["break"]
 
     ';'       shift, and go to state 41
     '('       shift, and go to state 42
@@ -1694,10 +1668,9 @@ State 107
     "return"  shift, and go to state 45
 
     NUM       reduce using rule 80 (s_push_num)
-    "break"   reduce using rule 85 (s_check_break)
-    "while"   reduce using rule 84 (s_push_scope_stack)
-    "switch"  reduce using rule 82 (s_switch_save)
-    $default  reduce using rule 67 (s_PID)
+    ID        reduce using rule 67 (s_PID)
+    "break"   reduce using rule 84 (s_check_break)
+    $default  reduce using rule 82 (s_switch_save)
 
     compound_stmt        go to state 46
     statement            go to state 113
@@ -1716,8 +1689,7 @@ State 107
     s_PID                go to state 60
     s_push_num           go to state 61
     s_switch_save        go to state 62
-    s_push_scope_stack   go to state 63
-    s_check_break        go to state 64
+    s_check_break        go to state 63
 
 
 State 108
@@ -1776,14 +1748,44 @@ State 110
 
 State 111
 
-   36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression • ')' '{' case_stmts default_stmt '}'
+   33 iteration_stmt: s_switch_save "while" s_jmp_to_expr '(' s_label • expression ')' s_save statement
+   42 expression: • var '=' expression s_Assign
+   43           | • simple_expression
+   44 var: • s_PID ID
+   45    | • s_PID ID '[' expression ']' s_array_select
+   46 simple_expression: • additive_expression relop additive_expression
+   47                  | • additive_expression
+   50 additive_expression: • additive_expression addop term
+   51                    | • term
+   54 term: • term mulop factor
+   55     | • factor
+   58 factor: • '(' expression ')'
+   59       | • var
+   60       | • call
+   61       | • s_push_num NUM
+   62 call: • s_PID ID '(' args ')'
+   67 s_PID: ε •  [ID]
+   80 s_push_num: ε •  [NUM]
 
-    ')'  shift, and go to state 116
+    '('  shift, and go to state 42
+
+    NUM       reduce using rule 80 (s_push_num)
+    $default  reduce using rule 67 (s_PID)
+
+    expression           go to state 116
+    var                  go to state 54
+    simple_expression    go to state 55
+    additive_expression  go to state 56
+    term                 go to state 57
+    factor               go to state 58
+    call                 go to state 59
+    s_PID                go to state 60
+    s_push_num           go to state 61
 
 
 State 112
 
-   33 iteration_stmt: s_push_scope_stack "while" s_label '(' expression • ')' s_save statement
+   36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression • ')' '{' case_stmts default_stmt '}'
 
     ')'  shift, and go to state 117
 
@@ -1817,19 +1819,16 @@ State 115
 
 State 116
 
-   36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' • '{' case_stmts default_stmt '}'
+   33 iteration_stmt: s_switch_save "while" s_jmp_to_expr '(' s_label expression • ')' s_save statement
 
-    '{'  shift, and go to state 120
+    ')'  shift, and go to state 120
 
 
 State 117
 
-   33 iteration_stmt: s_push_scope_stack "while" s_label '(' expression ')' • s_save statement
-   73 s_save: ε •
+   36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' • '{' case_stmts default_stmt '}'
 
-    $default  reduce using rule 73 (s_save)
-
-    s_save  go to state 121
+    '{'  shift, and go to state 121
 
 
 State 118
@@ -1851,86 +1850,23 @@ State 119
 
 State 120
 
+   33 iteration_stmt: s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' • s_save statement
+   73 s_save: ε •
+
+    $default  reduce using rule 73 (s_save)
+
+    s_save  go to state 124
+
+
+State 121
+
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' • case_stmts default_stmt '}'
    37 case_stmts: • case_stmts case_stmt
    38           | ε •
 
     $default  reduce using rule 38 (case_stmts)
 
-    case_stmts  go to state 124
-
-
-State 121
-
-   17 compound_stmt: • '{' local_declarations statement_list '}'
-   22 statement: • expression_stmt
-   23          | • compound_stmt
-   24          | • selection_stmt
-   25          | • iteration_stmt
-   26          | • return_stmt
-   27          | • switch_stmt
-   28 expression_stmt: • expression ';' s_pop_stack
-   29                | • s_check_break "break" ';'
-   30                | • ';'
-   31 selection_stmt: • "if" '(' expression ')' s_save statement s_jpf "endif"
-   32               | • "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
-   33 iteration_stmt: • s_push_scope_stack "while" s_label '(' expression ')' s_save statement
-   33               | s_push_scope_stack "while" s_label '(' expression ')' s_save • statement
-   34 return_stmt: • "return" ';'
-   35            | • "return" expression ';'
-   36 switch_stmt: • s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
-   42 expression: • var '=' expression s_Assign
-   43           | • simple_expression
-   44 var: • s_PID ID
-   45    | • s_PID ID '[' expression ']' s_array_select
-   46 simple_expression: • additive_expression relop additive_expression
-   47                  | • additive_expression
-   50 additive_expression: • additive_expression addop term
-   51                    | • term
-   54 term: • term mulop factor
-   55     | • factor
-   58 factor: • '(' expression ')'
-   59       | • var
-   60       | • call
-   61       | • s_push_num NUM
-   62 call: • s_PID ID '(' args ')'
-   67 s_PID: ε •  [ID]
-   80 s_push_num: ε •  [NUM]
-   82 s_switch_save: ε •  ["switch"]
-   84 s_push_scope_stack: ε •  ["while"]
-   85 s_check_break: ε •  ["break"]
-
-    ';'       shift, and go to state 41
-    '('       shift, and go to state 42
-    '{'       shift, and go to state 33
-    "if"      shift, and go to state 44
-    "return"  shift, and go to state 45
-
-    NUM       reduce using rule 80 (s_push_num)
-    "break"   reduce using rule 85 (s_check_break)
-    "while"   reduce using rule 84 (s_push_scope_stack)
-    "switch"  reduce using rule 82 (s_switch_save)
-    $default  reduce using rule 67 (s_PID)
-
-    compound_stmt        go to state 46
-    statement            go to state 125
-    expression_stmt      go to state 48
-    selection_stmt       go to state 49
-    iteration_stmt       go to state 50
-    return_stmt          go to state 51
-    switch_stmt          go to state 52
-    expression           go to state 53
-    var                  go to state 54
-    simple_expression    go to state 55
-    additive_expression  go to state 56
-    term                 go to state 57
-    factor               go to state 58
-    call                 go to state 59
-    s_PID                go to state 60
-    s_push_num           go to state 61
-    s_switch_save        go to state 62
-    s_push_scope_stack   go to state 63
-    s_check_break        go to state 64
+    case_stmts  go to state 125
 
 
 State 122
@@ -1943,12 +1879,12 @@ State 122
    26          | • return_stmt
    27          | • switch_stmt
    28 expression_stmt: • expression ';' s_pop_stack
-   29                | • s_check_break "break" ';'
+   29                | • s_check_break "break" s_break_out ';'
    30                | • ';'
    31 selection_stmt: • "if" '(' expression ')' s_save statement s_jpf "endif"
    32               | • "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
    32               | "if" '(' expression ')' s_save statement "else" s_jpf_save • statement s_jp "endif"
-   33 iteration_stmt: • s_push_scope_stack "while" s_label '(' expression ')' s_save statement
+   33 iteration_stmt: • s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
    34 return_stmt: • "return" ';'
    35            | • "return" expression ';'
    36 switch_stmt: • s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
@@ -1969,9 +1905,8 @@ State 122
    62 call: • s_PID ID '(' args ')'
    67 s_PID: ε •  [ID]
    80 s_push_num: ε •  [NUM]
-   82 s_switch_save: ε •  ["switch"]
-   84 s_push_scope_stack: ε •  ["while"]
-   85 s_check_break: ε •  ["break"]
+   82 s_switch_save: ε •  ["while", "switch"]
+   84 s_check_break: ε •  ["break"]
 
     ';'       shift, and go to state 41
     '('       shift, and go to state 42
@@ -1980,10 +1915,9 @@ State 122
     "return"  shift, and go to state 45
 
     NUM       reduce using rule 80 (s_push_num)
-    "break"   reduce using rule 85 (s_check_break)
-    "while"   reduce using rule 84 (s_push_scope_stack)
-    "switch"  reduce using rule 82 (s_switch_save)
-    $default  reduce using rule 67 (s_PID)
+    ID        reduce using rule 67 (s_PID)
+    "break"   reduce using rule 84 (s_check_break)
+    $default  reduce using rule 82 (s_switch_save)
 
     compound_stmt        go to state 46
     statement            go to state 126
@@ -2002,8 +1936,7 @@ State 122
     s_PID                go to state 60
     s_push_num           go to state 61
     s_switch_save        go to state 62
-    s_push_scope_stack   go to state 63
-    s_check_break        go to state 64
+    s_check_break        go to state 63
 
 
 State 123
@@ -2015,26 +1948,89 @@ State 123
 
 State 124
 
+   17 compound_stmt: • '{' local_declarations statement_list '}'
+   22 statement: • expression_stmt
+   23          | • compound_stmt
+   24          | • selection_stmt
+   25          | • iteration_stmt
+   26          | • return_stmt
+   27          | • switch_stmt
+   28 expression_stmt: • expression ';' s_pop_stack
+   29                | • s_check_break "break" s_break_out ';'
+   30                | • ';'
+   31 selection_stmt: • "if" '(' expression ')' s_save statement s_jpf "endif"
+   32               | • "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
+   33 iteration_stmt: • s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
+   33               | s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save • statement
+   34 return_stmt: • "return" ';'
+   35            | • "return" expression ';'
+   36 switch_stmt: • s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
+   42 expression: • var '=' expression s_Assign
+   43           | • simple_expression
+   44 var: • s_PID ID
+   45    | • s_PID ID '[' expression ']' s_array_select
+   46 simple_expression: • additive_expression relop additive_expression
+   47                  | • additive_expression
+   50 additive_expression: • additive_expression addop term
+   51                    | • term
+   54 term: • term mulop factor
+   55     | • factor
+   58 factor: • '(' expression ')'
+   59       | • var
+   60       | • call
+   61       | • s_push_num NUM
+   62 call: • s_PID ID '(' args ')'
+   67 s_PID: ε •  [ID]
+   80 s_push_num: ε •  [NUM]
+   82 s_switch_save: ε •  ["while", "switch"]
+   84 s_check_break: ε •  ["break"]
+
+    ';'       shift, and go to state 41
+    '('       shift, and go to state 42
+    '{'       shift, and go to state 33
+    "if"      shift, and go to state 44
+    "return"  shift, and go to state 45
+
+    NUM       reduce using rule 80 (s_push_num)
+    ID        reduce using rule 67 (s_PID)
+    "break"   reduce using rule 84 (s_check_break)
+    $default  reduce using rule 82 (s_switch_save)
+
+    compound_stmt        go to state 46
+    statement            go to state 127
+    expression_stmt      go to state 48
+    selection_stmt       go to state 49
+    iteration_stmt       go to state 50
+    return_stmt          go to state 51
+    switch_stmt          go to state 52
+    expression           go to state 53
+    var                  go to state 54
+    simple_expression    go to state 55
+    additive_expression  go to state 56
+    term                 go to state 57
+    factor               go to state 58
+    call                 go to state 59
+    s_PID                go to state 60
+    s_push_num           go to state 61
+    s_switch_save        go to state 62
+    s_check_break        go to state 63
+
+
+State 125
+
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts • default_stmt '}'
    37 case_stmts: case_stmts • case_stmt
    39 case_stmt: • "case" s_switch_jf NUM ':' statement_list
    40 default_stmt: • "default" ':' statement_list
    41             | ε •  ['}']
 
-    "case"     shift, and go to state 127
-    "default"  shift, and go to state 128
+    "case"     shift, and go to state 128
+    "default"  shift, and go to state 129
 
     $default  reduce using rule 41 (default_stmt)
 
-    case_stmt     go to state 129
-    default_stmt  go to state 130
-
-
-State 125
-
-   33 iteration_stmt: s_push_scope_stack "while" s_label '(' expression ')' s_save statement •
-
-    $default  reduce using rule 33 (iteration_stmt)
+    case_stmt     go to state 130
+    default_stmt  go to state 131
 
 
 State 126
@@ -2044,55 +2040,62 @@ State 126
 
     $default  reduce using rule 71 (s_jp)
 
-    s_jp  go to state 131
+    s_jp  go to state 132
 
 
 State 127
+
+   33 iteration_stmt: s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement •
+
+    $default  reduce using rule 33 (iteration_stmt)
+
+
+State 128
 
    39 case_stmt: "case" • s_switch_jf NUM ':' statement_list
    75 s_switch_jf: ε •
 
     $default  reduce using rule 75 (s_switch_jf)
 
-    s_switch_jf  go to state 132
-
-
-State 128
-
-   40 default_stmt: "default" • ':' statement_list
-
-    ':'  shift, and go to state 133
+    s_switch_jf  go to state 133
 
 
 State 129
+
+   40 default_stmt: "default" • ':' statement_list
+
+    ':'  shift, and go to state 134
+
+
+State 130
 
    37 case_stmts: case_stmts case_stmt •
 
     $default  reduce using rule 37 (case_stmts)
 
 
-State 130
+State 131
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt • '}'
 
-    '}'  shift, and go to state 134
-
-
-State 131
-
-   32 selection_stmt: "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp • "endif"
-
-    "endif"  shift, and go to state 135
+    '}'  shift, and go to state 135
 
 
 State 132
 
-   39 case_stmt: "case" s_switch_jf • NUM ':' statement_list
+   32 selection_stmt: "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp • "endif"
 
-    NUM  shift, and go to state 136
+    "endif"  shift, and go to state 136
 
 
 State 133
+
+   39 case_stmt: "case" s_switch_jf • NUM ':' statement_list
+
+    NUM  shift, and go to state 137
+
+
+State 134
 
    20 statement_list: • statement_list statement
    21               | ε •
@@ -2100,31 +2103,31 @@ State 133
 
     $default  reduce using rule 21 (statement_list)
 
-    statement_list  go to state 137
+    statement_list  go to state 138
 
 
-State 134
+State 135
 
    36 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}' •
 
     $default  reduce using rule 36 (switch_stmt)
 
 
-State 135
+State 136
 
    32 selection_stmt: "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif" •
 
     $default  reduce using rule 32 (selection_stmt)
 
 
-State 136
+State 137
 
    39 case_stmt: "case" s_switch_jf NUM • ':' statement_list
 
-    ':'  shift, and go to state 138
+    ':'  shift, and go to state 139
 
 
-State 137
+State 138
 
    17 compound_stmt: • '{' local_declarations statement_list '}'
    20 statement_list: statement_list • statement
@@ -2135,11 +2138,11 @@ State 137
    26          | • return_stmt
    27          | • switch_stmt
    28 expression_stmt: • expression ';' s_pop_stack
-   29                | • s_check_break "break" ';'
+   29                | • s_check_break "break" s_break_out ';'
    30                | • ';'
    31 selection_stmt: • "if" '(' expression ')' s_save statement s_jpf "endif"
    32               | • "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
-   33 iteration_stmt: • s_push_scope_stack "while" s_label '(' expression ')' s_save statement
+   33 iteration_stmt: • s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
    34 return_stmt: • "return" ';'
    35            | • "return" expression ';'
    36 switch_stmt: • s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
@@ -2161,9 +2164,8 @@ State 137
    62 call: • s_PID ID '(' args ')'
    67 s_PID: ε •  [ID]
    80 s_push_num: ε •  [NUM]
-   82 s_switch_save: ε •  ["switch"]
-   84 s_push_scope_stack: ε •  ["while"]
-   85 s_check_break: ε •  ["break"]
+   82 s_switch_save: ε •  ["while", "switch"]
+   84 s_check_break: ε •  ["break"]
 
     ';'       shift, and go to state 41
     '('       shift, and go to state 42
@@ -2173,10 +2175,9 @@ State 137
 
     NUM       reduce using rule 80 (s_push_num)
     ID        reduce using rule 67 (s_PID)
-    "break"   reduce using rule 85 (s_check_break)
-    "while"   reduce using rule 84 (s_push_scope_stack)
-    "switch"  reduce using rule 82 (s_switch_save)
-    $default  reduce using rule 40 (default_stmt)
+    '}'       reduce using rule 40 (default_stmt)
+    "break"   reduce using rule 84 (s_check_break)
+    $default  reduce using rule 82 (s_switch_save)
 
     compound_stmt        go to state 46
     statement            go to state 47
@@ -2195,11 +2196,10 @@ State 137
     s_PID                go to state 60
     s_push_num           go to state 61
     s_switch_save        go to state 62
-    s_push_scope_stack   go to state 63
-    s_check_break        go to state 64
+    s_check_break        go to state 63
 
 
-State 138
+State 139
 
    20 statement_list: • statement_list statement
    21               | ε •
@@ -2207,10 +2207,10 @@ State 138
 
     $default  reduce using rule 21 (statement_list)
 
-    statement_list  go to state 139
+    statement_list  go to state 140
 
 
-State 139
+State 140
 
    17 compound_stmt: • '{' local_declarations statement_list '}'
    20 statement_list: statement_list • statement
@@ -2221,11 +2221,11 @@ State 139
    26          | • return_stmt
    27          | • switch_stmt
    28 expression_stmt: • expression ';' s_pop_stack
-   29                | • s_check_break "break" ';'
+   29                | • s_check_break "break" s_break_out ';'
    30                | • ';'
    31 selection_stmt: • "if" '(' expression ')' s_save statement s_jpf "endif"
    32               | • "if" '(' expression ')' s_save statement "else" s_jpf_save statement s_jp "endif"
-   33 iteration_stmt: • s_push_scope_stack "while" s_label '(' expression ')' s_save statement
+   33 iteration_stmt: • s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
    34 return_stmt: • "return" ';'
    35            | • "return" expression ';'
    36 switch_stmt: • s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
@@ -2247,9 +2247,8 @@ State 139
    62 call: • s_PID ID '(' args ')'
    67 s_PID: ε •  [ID]
    80 s_push_num: ε •  [NUM]
-   82 s_switch_save: ε •  ["switch"]
-   84 s_push_scope_stack: ε •  ["while"]
-   85 s_check_break: ε •  ["break"]
+   82 s_switch_save: ε •  ["while", "switch"]
+   84 s_check_break: ε •  ["break"]
 
     ';'       shift, and go to state 41
     '('       shift, and go to state 42
@@ -2259,8 +2258,8 @@ State 139
 
     NUM       reduce using rule 80 (s_push_num)
     ID        reduce using rule 67 (s_PID)
-    "break"   reduce using rule 85 (s_check_break)
-    "while"   reduce using rule 84 (s_push_scope_stack)
+    "break"   reduce using rule 84 (s_check_break)
+    "while"   reduce using rule 82 (s_switch_save)
     "switch"  reduce using rule 82 (s_switch_save)
     $default  reduce using rule 39 (case_stmt)
 
@@ -2281,5 +2280,4 @@ State 139
     s_PID                go to state 60
     s_push_num           go to state 61
     s_switch_save        go to state 62
-    s_push_scope_stack   go to state 63
-    s_check_break        go to state 64
+    s_check_break        go to state 63

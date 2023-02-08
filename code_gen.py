@@ -153,7 +153,6 @@ def switch_jf():
 def case_stmt():
     PB[ss[-2]] = f"(JPF, {ss[-1]}, {i() + 1}, )"
     pop(2)
-    PB.append(f"(JP, {ss[-2]}, , )")
 
 
 def switch_stmt():
@@ -173,9 +172,12 @@ def jpf():
 
 
 def jpf_save():
-    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i()+1}, )"
+    PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, )"
     pop(2)
-    push(i() - 1)
+    # todo check
+    push(i()-1)
+    # push(i())
+    # PB.append("")
 
 
 def jp():
@@ -196,6 +198,11 @@ def iteration_stmt():
     PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, )"
     PB.append(f"(JP, {ss[-3]}, , )")
     pop(3)
+    PB[ss[-1]] = f"(JP, {i()}, , )"
+
+
+def break_out():
+    PB.append(f"(JP, {ss[-4]}, , )")
 
 
 def call():
