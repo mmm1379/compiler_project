@@ -9,10 +9,9 @@
 9.	case
 10.	return
 11.	endif
-12.	result
-13.	f
+12.	foo
+13.	x
 14.	a
-15.	count
-16.	main
-17.	i
-18.	output
+15.	j
+16.	output
+17.	main

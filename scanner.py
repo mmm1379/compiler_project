@@ -147,8 +147,7 @@ dfaGraph.Nodes["Invalid input"].setChildren([(0, "ascii")])
 #     for edge in node.edges:
 #         print(edge)
 # exit(0)
-inputFile = open(f"testcases/O{input()}-SEMANTIC/input.txt", "rb")
-# inputFile = open("input.txt", "rb")
+inputFile = open("input.txt", "rb")
 symbol_dict = {
     "if": "KEYWORD",
     "else": "KEYWORD",

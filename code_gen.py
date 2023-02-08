@@ -13,7 +13,8 @@ class Row:
             self.returnAddress = getLastVarAddressAndUpdate()
             args = []
             for i in range(length):
-                args.append(findRowByAddress(ss[-1]))
+                arg = findRowByAddress(ss[-1])
+                args.append(arg)
                 pop()
             self.args = args[::-1]
 
@@ -66,6 +67,8 @@ def pop(times=1):
 
 
 def findAddress(token):
+    if token not in symbol_table:
+        return -1
     return symbol_table[token].address
 
 
@@ -228,7 +231,8 @@ def call():
     fRow = symbol_table[fName]
     address = fRow.address
     for j, arg in enumerate(fRow.args[::-1]):
-        PB.append(f"(ASSIGN, {ss[-(j + 1)]}, {arg.address}, )")
+        if arg is not None:
+            PB.append(f"(ASSIGN, {ss[-(j + 1)]}, {arg.address}, )")
     pop(len(fRow.args))
     PB.append(f"(ASSIGN, #{i() + 2}, {fRow.returnAddress}, )")
     PB.append(f"(JP, {address}, , )")
@@ -307,11 +311,9 @@ def cod_gen(node, token, lN):
     if action_symbol.startswith("s_"):
         func_name = action_symbol[2:]
     if func_name in globals():
-        try:
-            checkInputForErrors(func_name)
+        if checkInputForErrors(func_name) not in ["call failed"]:
+
             globals()[func_name]()
-        except:
-            pass
 
 
 def checkInputForErrors(func_name):
@@ -323,11 +325,16 @@ def checkInputForErrors(func_name):
     if result and func_name == "call":
         result &= checkFunctionParameters()
         if not result:
-            raise Exception()
+            return "call failed"
     if result and func_name == "check_break":
         result &= checkCorrectBreak()
     if result and func_name in ["simple_expression", "additive_expression", "term"]:
-        result &= checkTypeEquals()
+        try:
+            result &= checkTypeEquals()
+        except Exception as e:
+            if e.args[0] == "not in table":
+                return result
+            raise e
     return result
 
 
@@ -349,7 +356,7 @@ def checkDeclarationNotVoid():
     if typeSpecifier == "void":
         global lineNumber
         lineNumber -= 1
-        writeSemanticError(f"'Illegal type of void for '{lexeme}'")
+        writeSemanticError(f"Illegal type of void for '{lexeme}'")
         return False
     return True
 
@@ -374,6 +381,11 @@ def checkFunctionParameters():
 
 
 def checkParamLenMatch(argList, fRow):
+    if len(argList) < len(fRow.args):
+        for _ in range(len(fRow.args) - len(argList)):
+            push(-1)
+    if len(argList) > len(fRow.args):
+        pop(len(argList) - len(fRow.args))
     if len(argList) != len(fRow.args):
         writeSemanticError(f"Mismatch in numbers of arguments of '{fRow.lexeme}'")
         return False
@@ -390,6 +402,8 @@ def findRowByAddress(address):
 def checkParamTypeMatch(argList, fRow):
     returnValue = True
     for i, arg in enumerate(argList[::-1]):
+        if fRow.args[i] is None:
+            return True
         trueFuncArgType = fRow.args[i].type
         if '#' in str(ss[-(len(argList) - i)]):
             t = "int"
@@ -423,6 +437,8 @@ def checkTypeEquals():
         def getVarType(var):
             if len(var.children) == 2:
                 lexeme = var.children[0].actualName[1]
+                if lexeme not in symbol_table:
+                    raise Exception("not in table")
                 return symbol_table[lexeme].type
             else:
                 return "int"
@@ -450,13 +466,13 @@ def checkTypeEquals():
     type2 = getType(findChildFactor(currentNode.children[2]))
 
     if type1 != type2:
-        writeSemanticError(f"Type mismatch in operands, Got {type2} instead of {type1}")
+        writeSemanticError(f"Type mismatch in operands, Got {type1} instead of {type2}")
         return False
     return True
 
 
 def writeSemanticError(toWrite):
-    semanticErrorFile.write(f"# {lineNumber} : Semantic Error! {toWrite}.\n")
+    semanticErrorFile.write(f"#{lineNumber} : Semantic Error! {toWrite}.\n")
     global hasSemanticError
     hasSemanticError = True
 
