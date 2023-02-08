@@ -1,5 +1,5 @@
 class Row:
-    def __init__(self, address, lexeme, function, length, type, scope):
+    def __init__(self, address, lexeme, function, length, type, scope, returnValue=None):
         self.address = address
         self.lexeme = lexeme
         self.function = function
@@ -8,6 +8,7 @@ class Row:
         self.scope = scope
         self.args = []
         if self.function:
+            self.returnValue = returnValue
             self.returnAddress = getLastVarAddressAndUpdate()
             args = []
             for i in range(length):
@@ -25,6 +26,7 @@ scope = 0
 symbol_table = {"output": Row(-1, 0, 0, 0, 0, 0)}
 lastVarAddress = 0
 lastTempAddress = 0
+returnValueAddress = None
 
 scopeStack = []
 
@@ -92,7 +94,9 @@ def fun_declaration():
     if lexeme == 'main' and not scope:
         PB[0] = f"(JP, {address}, , )"
     pop()
-    params = currentNode.children[-4].children
+    params = currentNode.children[-5].children
+    if len(params) == 0:
+        pass
     if params[0].name == 'void':
         paramLen = 0
     else:
@@ -101,7 +105,7 @@ def fun_declaration():
         params = ps
         paramLen = len(params)
 
-    symbol_table[lexeme] = Row(address, lexeme, True, paramLen, "func", scope)
+    symbol_table[lexeme] = Row(address, lexeme, True, paramLen, "func", scope, returnValue=returnValueAddress)
 
     if lexeme == 'main' and not scope:
         return
@@ -134,7 +138,7 @@ def save():
 
 
 def switch_save():
-    scopeStack.append(i()+1)
+    scopeStack.append(i() + 1)
     save()
     save()
 
@@ -175,9 +179,9 @@ def jpf_save():
     PB[ss[-1]] = f"(JPF, {ss[-2]}, {i() + 1}, )"
     pop(2)
     # todo check
-    push(i()-1)
-    # push(i())
-    # PB.append("")
+    # push(i() - 1)
+    push(i())
+    PB.append("")
 
 
 def jp():
@@ -221,6 +225,16 @@ def call():
     PB.append(f"(ASSIGN, #{i() + 2}, {fRow.returnAddress}, )")
     PB.append(f"(JP, {address}, , )")
     # push(i())
+
+
+def set_return_value_address():
+    global returnValueAddress
+    returnValueAddress = getLastVarAddressAndUpdate()
+
+
+def return_expression():
+    PB.append(f"(ASSIGN, {ss[-1]}, {returnValueAddress})")
+    pop()
 
 
 def push_num():
@@ -356,7 +370,7 @@ def findRowByAddress(address):
 def checkParamTypeMatch(argList, fRow):
     returnValue = True
     for i, arg in enumerate(argList[::-1]):
-        argRow = findRowByAddress(ss[-(len(argList) - i)])
+        argRow = findRowByAddress(ss[-(len(argList) - i+1)])
         trueFuncArgType = findRowByAddress(fRow.args[i]).type
 
         if argRow.type != trueFuncArgType:

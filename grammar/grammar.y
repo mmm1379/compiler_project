@@ -16,7 +16,7 @@ var_declaration: type_specifier ID ';' s_atomic_var_declaration
 type_specifier: "int"
 | "void"
 ;
-fun_declaration: type_specifier ID '(' params ')' s_label compound_stmt
+fun_declaration: type_specifier ID s_set_return_value_address '(' params ')' s_label compound_stmt
 ;
 
 params: param_list
@@ -53,7 +53,7 @@ selection_stmt: "if" '(' expression ')' s_save statement s_jpf "endif"
 iteration_stmt: s_switch_save "while" s_jmp_to_expr '(' s_label expression ')' s_save statement
 ;
 return_stmt: "return" ';'
-| "return" expression ';'
+| "return" expression s_return_expression ';'
 ;
 switch_stmt: s_switch_save "switch" '(' s_jmp_to_expr expression ')' '{' case_stmts default_stmt '}'
 ;
@@ -140,6 +140,10 @@ s_array_select : /* epsilon */
 s_check_break : /* epsilon */
 ;
 s_break_out : /* epsilon */
+;
+s_return_expression : /* epsilon */
+;
+s_set_return_value_address : /* epsilon */
 ;
 
 %%
