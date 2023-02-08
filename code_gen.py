@@ -134,7 +134,7 @@ def save():
 
 
 def switch_save():
-    scopeStack.append("breakStmt")
+    scopeStack.append(i()+1)
     save()
     save()
 
@@ -151,7 +151,7 @@ def switch_jf():
 
 
 def case_stmt():
-    PB[ss[-2]] = f"(JPF, {ss[-1]}, {i() + 1}, )"
+    PB[ss[-2]] = f"(JPF, {ss[-1]}, {i()}, )"
     pop(2)
 
 
@@ -199,10 +199,11 @@ def iteration_stmt():
     PB.append(f"(JP, {ss[-3]}, , )")
     pop(3)
     PB[ss[-1]] = f"(JP, {i()}, , )"
+    pop(2)
 
 
 def break_out():
-    PB.append(f"(JP, {ss[-4]}, , )")
+    PB.append(f"(JP, {scopeStack[-1]}, , )")
 
 
 def call():
@@ -266,7 +267,7 @@ def array_select():
     t1 = getLastVarAddressAndUpdate()
     t2 = getLastVarAddressAndUpdate()
     PB.append(f"(MULT, {ss[-1]}, #4, {t2})")
-    PB.append(f"(ADD, {ss[-2]}, {t2}, {t1})")
+    PB.append(f"(ADD, #{ss[-2]}, {t2}, {t1})")
     pop(2)
     push(f"@{t1}")
 

@@ -10,7 +10,5 @@
 10.	return
 11.	endif
 12.	main
-13.	a
-14.	b
-15.	c
-16.	output
+13.	i
+14.	output
