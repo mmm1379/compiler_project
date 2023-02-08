@@ -227,7 +227,7 @@ def call():
     PB.append(f"(ASSIGN, #{i() + 2}, {fRow.returnAddress}, )")
     PB.append(f"(JP, {address}, , )")
     pop()
-    push(fRow.returnAddress)
+    push(fRow.returnValue)
 
 
 def set_return_value_address():
