@@ -9,11 +9,8 @@
 9.	case
 10.	return
 11.	endif
-12.	abs
+12.	main
 13.	a
-14.	main
-15.	i
-16.	j
-17.	sum
-18.	flag
-19.	b
+14.	b
+15.	c
+16.	output
