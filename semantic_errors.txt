@@ -1,1 +1,7 @@
-The input program is semantically correct.
+# 6 : Semantic Error! 'count' is not defined.
+# 6 : Semantic Error! 'count' is not defined.
+# 28 : Semantic Error! Type mismatch in operands, Got int instead of array.
+# 30 : Semantic Error! 'count' is not defined.
+# 31 : Semantic Error! 'f' is not defined.
+# 31 : Semantic Error! 'f' is not defined.
+# 32 : Semantic Error! 'count' is not defined.

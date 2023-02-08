@@ -1,5 +1,5 @@
 class Row:
-    def __init__(self, address, lexeme, function, length, type, scope, returnValue=None, returnType= None):
+    def __init__(self, address, lexeme, function, length, type, scope, returnValue=None, returnType=None):
         self.address = address
         self.lexeme = lexeme
         self.function = function
@@ -107,7 +107,8 @@ def fun_declaration():
         params = ps
         paramLen = len(params)
 
-    symbol_table[lexeme] = Row(address, lexeme, True, paramLen, "func", scope, returnValue=returnValueAddress, returnType = returnType)
+    symbol_table[lexeme] = Row(address, lexeme, True, paramLen, "func", scope, returnValue=returnValueAddress,
+                               returnType=returnType)
 
     if lexeme == 'main' and not scope:
         return
@@ -208,8 +209,13 @@ def iteration_stmt():
     pop(2)
 
 
+def check_break():
+    pass
+
+
 def break_out():
-    PB.append(f"(JP, {scopeStack[-1]}, , )")
+    if len(scopeStack):
+        PB.append(f"(JP, {scopeStack[-1]}, , )")
 
 
 def call():
@@ -301,8 +307,11 @@ def cod_gen(node, token, lN):
     if action_symbol.startswith("s_"):
         func_name = action_symbol[2:]
     if func_name in globals():
-        checkInputForErrors(func_name)
-        globals()[func_name]()
+        try:
+            checkInputForErrors(func_name)
+            globals()[func_name]()
+        except:
+            pass
 
 
 def checkInputForErrors(func_name):
@@ -313,10 +322,13 @@ def checkInputForErrors(func_name):
         result &= checkDeclarationNotVoid()
     if result and func_name == "call":
         result &= checkFunctionParameters()
+        if not result:
+            raise Exception()
     if result and func_name == "check_break":
         result &= checkCorrectBreak()
     if result and func_name in ["simple_expression", "additive_expression", "term"]:
         result &= checkTypeEquals()
+    return result
 
 
 def checkScopingError(func_name):
@@ -335,6 +347,8 @@ def checkDeclarationNotVoid():
     typeSpecifier = currentNode.children[-1].children[0].actualName[1]
     lexeme = currentNode.children[-2].actualName[1]
     if typeSpecifier == "void":
+        global lineNumber
+        lineNumber -= 1
         writeSemanticError(f"'Illegal type of void for '{lexeme}'")
         return False
     return True
@@ -354,7 +368,8 @@ def checkFunctionParameters():
         argList.append(tempNode.children[0])
         tempNode = tempNode.children[-1]
     result = checkParamLenMatch(argList, fRow)
-    result &= checkParamTypeMatch(argList, fRow)
+    if result:
+        result = checkParamTypeMatch(argList, fRow)
     return result
 
 
@@ -383,7 +398,7 @@ def checkParamTypeMatch(argList, fRow):
             t = argRow.type
         if t != trueFuncArgType:
             writeSemanticError(f"Mismatch in type of argument {i + 1} of '{fRow.lexeme}'. Expected '{trueFuncArgType}' "
-                               f"but got '{argRow.type}' instead")
+                               f"but got '{t}' instead")
             returnValue = False
     return returnValue
 
@@ -460,7 +475,7 @@ def checkIfFileContainedErrors():
 def writePB():
     text_file = open("output.txt", "w")
     if hasSemanticError:
-        text_file.write(f"The output code has not been generated")
+        text_file.write(f"The output code has not been generated.")
     else:
         for i, x in enumerate(PB):
             # print(f"{i}\t{x}")

@@ -9,8 +9,10 @@
 9.	case
 10.	return
 11.	endif
-12.	main
-13.	a
-14.	b
-15.	c
-16.	output
+12.	result
+13.	f
+14.	a
+15.	count
+16.	main
+17.	i
+18.	output
