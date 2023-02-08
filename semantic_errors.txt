@@ -1,2 +1,1 @@
-# 14 : Semantic Error! Mismatch in type of argument 1 of 'foo'. Expected 'int' but got 'func' instead.
-# 16 : Semantic Error! Mismatch in type of argument 1 of 'foo'. Expected 'int' but got 'func' instead.
+The input program is semantically correct.

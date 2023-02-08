@@ -1,5 +1,5 @@
 class Row:
-    def __init__(self, address, lexeme, function, length, type, scope, returnValue=None):
+    def __init__(self, address, lexeme, function, length, type, scope, returnValue=None, returnType= None):
         self.address = address
         self.lexeme = lexeme
         self.function = function
@@ -8,11 +8,12 @@ class Row:
         self.scope = scope
         self.args = []
         if self.function:
+            self.returnType = returnType
             self.returnValue = returnValue
             self.returnAddress = getLastVarAddressAndUpdate()
             args = []
             for i in range(length):
-                args.append(ss[-1])
+                args.append(findRowByAddress(ss[-1]))
                 pop()
             self.args = args[::-1]
 
@@ -89,6 +90,7 @@ def getParamsNonRecursive(node, ps):
 
 
 def fun_declaration():
+    returnType = currentNode.children[-1].children[0].actualName[1]
     lexeme = currentNode.children[-2].actualName[1]
     address = ss[-1]
     if lexeme == 'main' and not scope:
@@ -105,7 +107,7 @@ def fun_declaration():
         params = ps
         paramLen = len(params)
 
-    symbol_table[lexeme] = Row(address, lexeme, True, paramLen, "func", scope, returnValue=returnValueAddress)
+    symbol_table[lexeme] = Row(address, lexeme, True, paramLen, "func", scope, returnValue=returnValueAddress, returnType = returnType)
 
     if lexeme == 'main' and not scope:
         return
@@ -220,7 +222,7 @@ def call():
     fRow = symbol_table[fName]
     address = fRow.address
     for j, arg in enumerate(fRow.args[::-1]):
-        PB.append(f"(ASSIGN, {ss[-(j + 1)]}, {arg}, )")
+        PB.append(f"(ASSIGN, {ss[-(j + 1)]}, {arg.address}, )")
     pop(len(fRow.args))
     PB.append(f"(ASSIGN, #{i() + 2}, {fRow.returnAddress}, )")
     PB.append(f"(JP, {address}, , )")
@@ -370,10 +372,13 @@ def findRowByAddress(address):
 def checkParamTypeMatch(argList, fRow):
     returnValue = True
     for i, arg in enumerate(argList[::-1]):
-        argRow = findRowByAddress(ss[-(len(argList) - i+1)])
-        trueFuncArgType = findRowByAddress(fRow.args[i]).type
-
-        if argRow.type != trueFuncArgType:
+        trueFuncArgType = fRow.args[i].type
+        if '#' in str(ss[-(len(argList) - i)]):
+            t = "int"
+        else:
+            argRow = findRowByAddress(ss[-(len(argList) - i)])
+            t = argRow.type
+        if t != trueFuncArgType:
             writeSemanticError(f"Mismatch in type of argument {i + 1} of '{fRow.lexeme}'. Expected '{trueFuncArgType}' "
                                f"but got '{argRow.type}' instead")
             returnValue = False
@@ -404,8 +409,8 @@ def checkTypeEquals():
             else:
                 return "int"
 
-        # def getCallType(call):
-        #     pass
+        def getCallType(call):
+            return symbol_table[call.children[-2].actualName[1]].returnType
 
         def getExpressionType(expression):
             if len(expression.children) == 4:
@@ -416,8 +421,8 @@ def checkTypeEquals():
         if len(factor.children) == 1:
             if factor.children[0].actualName == "var":
                 return getVarType(factor.children[0])
-            # else:
-            #     return getCallType(factor.children[0])
+            else:
+                return getCallType(factor.children[0])
         elif len(factor.children) == 2:
             return "int"
         else:
