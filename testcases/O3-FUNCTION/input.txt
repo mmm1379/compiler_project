@@ -24,11 +24,6 @@ void main(void) {
     b = 3;
 
     while (abs(i) < abs(a) + 1){
-        if (i * b == a) {
-            flag = 1;
-            break;
-        } else {
-            i = i + 1;
-        } endif
+        i = i+1;
     }
 }
