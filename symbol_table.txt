@@ -11,12 +11,9 @@
 11.	endif
 12.	abs
 13.	a
-14.	isMultiplier
-15.	b
-16.	i
-17.	step
+14.	main
+15.	i
+16.	j
+17.	sum
 18.	flag
-19.	main
-20.	j
-21.	sum
-22.	output
+19.	b

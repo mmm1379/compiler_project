@@ -15,12 +15,12 @@ void main(void) {
     int i;
     int j;
     int sum;
-    i = 1;
-    j = 1;
-    int a;
-    a = 1;
     int flag;
     int b;
+    int a;
+    i = 1;
+    j = 1;
+    a = 1;
     b = 3;
 
     while (abs(i) < abs(a) + 1){
